@@ -300,6 +300,16 @@ function simple_access_form_alter($form_id, &$form){
 }
 
 function simple_access_form($node){
+  // Get the array of checkbox options to use for each form element.  
+  // If the "Show groups even when user is not a member" setting is
+  // enabled, or if the current user has 'administer nodes', let
+  // them choose from any of the SA groups.
+  $groups = simple_access_group_select();
+  $profiles = simple_access_get_profiles_select();
+
+  if (empty($groups) && empty($profiles)) {
+    return;
+  }
   $user_groups = array_filter($node->simple_access, '_simple_access_filter_access');
   // set up the outer fieldset
   $form['sa'] = array(
@@ -309,32 +319,30 @@ function simple_access_form($node){
     '#collapsed' => empty($user_groups) && empty($node->simple_access_profiles),
     '#access' => user_access('assign access to profiles') || user_access('assign access to nodes') || user_access('administer nodes'),
   );
-  $form['sa']['simple_access_profiles'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Access profile'),
-    '#default_value' => $node->simple_access_profiles,
-    '#options' => simple_access_get_profiles_select(),
-    '#access' => user_access('assign access to profiles') || user_access('administer nodes'),
-  );
-  $form['sa']['simple_access'] = array(
-    '#tree' => TRUE,
-    '#weight' => 5,
-    '#access' => user_access('assign access to nodes') || user_access('administer nodes'),
-    '#theme' => 'simple_access_form',
-  );
+  if (!empty($profiles)) {
+    $form['sa']['simple_access_profiles'] = array(
+      '#type' => 'checkboxes',
+      '#title' => t('Access profile'),
+      '#default_value' => $node->simple_access_profiles,
+      '#options' => $profiles,
+      '#access' => user_access('assign access to profiles') || user_access('administer nodes'),
+    );
+  }
+  if (!empty($groups)) {
+    $form['sa']['simple_access'] = array(
+      '#tree' => TRUE,
+      '#weight' => 5,
+      '#access' => user_access('assign access to nodes') || user_access('administer nodes'),
+      '#theme' => 'simple_access_form',
+    );
 
-  // See what form elements we should include. If not configured,
-  // only enable the 'view' elements by default.
-  $variable = variable_get('sa_display', array('view' => 1));
+    // See what form elements we should include. If not configured,
+    // only enable the 'view' elements by default.
+    $variable = variable_get('sa_display', array('view' => 1));
 
-  // Get the array of checkbox options to use for each form element.  
-  // If the "Show groups even when user is not a member" setting is
-  // enabled, or if the current user has 'administer nodes', let
-  // them choose from any of the SA groups.
-  $groups = simple_access_group_select();
-
-  foreach ($groups as $gid => $group) {
-    $form['sa']['simple_access'][$gid] = simple_access_form_row($gid, $group, $node->simple_access);
+    foreach ($groups as $gid => $group) {
+      $form['sa']['simple_access'][$gid] = simple_access_form_row($gid, $group, $node->simple_access);
+    }
   }
   return $form;
 }
