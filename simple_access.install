@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * Simple Access Installation file
+ */
+
+/**
  * Implementation of hook_install()
  */
 function simple_access_install() {

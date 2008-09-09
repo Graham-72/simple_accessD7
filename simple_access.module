@@ -175,7 +175,7 @@ function simple_access_nodeapi(&$node, $op) {
     case 'load':
       $extra = array();
       $result = db_query('SELECT na.gid, na.view, na.update, na.delete FROM {simple_access_node} na WHERE na.nid = %d', $node->nid);
-      while($grant = db_fetch_array($result)) {
+      while ($grant = db_fetch_array($result)) {
         $gid = $grant['gid'];
         unset($grant['gid']);
         $extra[$gid] = $grant;
@@ -219,8 +219,7 @@ function simple_access_nodeapi(&$node, $op) {
 /**
  * Implementation of hook_node_access_records
  */
-function simple_access_node_access_records($node)
-{
+function simple_access_node_access_records($node) {
   $records = array();
 
   if ($node->simple_access_profiles) {
@@ -240,7 +239,7 @@ function simple_access_node_access_records($node)
     // loop through simple_access arrays from page submission
     // $type is either 'view', 'update', or 'delete'
 
-    foreach($node->simple_access as $gid => $access) {
+    foreach ($node->simple_access as $gid => $access) {
       if ($access['view'] || $access['update'] || $access['delete']) {
         $records[] = array(
           'realm' => 'simple_access',
@@ -290,7 +289,7 @@ function simple_access_node_grants($account, $op) {
   return $grants;
 }
 
-function simple_access_form_alter($form_id, &$form){
+function simple_access_form_alter($form_id, &$form) {
   // if this is a node form...
   if (isset($form['type']) && $form['type']['#value'] .'_node_form' == $form_id) {
     if ($simple_access_form = simple_access_form($form['#node'])) {
@@ -299,7 +298,7 @@ function simple_access_form_alter($form_id, &$form){
   }
 }
 
-function simple_access_form($node){
+function simple_access_form($node) {
   // Get the array of checkbox options to use for each form element.  
   // If the "Show groups even when user is not a member" setting is
   // enabled, or if the current user has 'administer nodes', let
@@ -418,8 +417,8 @@ function theme_simple_access_form($form) {
   }
 
   if (!empty($rows)) {
-    $output.= theme('table', $head, $rows);
-    $output.= drupal_render($form);
+    $output .= theme('table', $head, $rows);
+    $output .= drupal_render($form);
     return $output;
   }
 }
@@ -451,14 +450,14 @@ function simple_access_page_overview() {
       $gid = $g['gid'];
       $rows[$gid]['group'] = $g['name'];
       $r = array();
-      foreach($g['roles'] as $rid) {
+      foreach ($g['roles'] as $rid) {
         $r[] = $roles[$rid];
       }
-      $rows[$gid]['roles'] = "<span style='font-size:xx-small'>".implode(', ', $r)."</span>";
-      $rows[$gid]['ops'] = l('edit', 'admin/user/simple_access/edit/'.$gid). '&nbsp;'. l('delete', 'admin/user/simple_access/delete/'.$gid);
+      $rows[$gid]['roles'] = "<span style='font-size:xx-small'>". implode(', ', $r) ."</span>";
+      $rows[$gid]['ops'] = l('edit', 'admin/user/simple_access/edit/'. $gid) .'&nbsp;'. l('delete', 'admin/user/simple_access/delete/'. $gid);
     }
-    $output .= theme('table', $header, $rows, array('style'=>'width:100%'));
-    $output .= '<br />'.l(t('add another access group'), 'admin/user/simple_access/add');
+    $output .= theme('table', $header, $rows, array('style' => 'width:100%'));
+    $output .= '<br />'. l(t('add another access group'), 'admin/user/simple_access/add');
     return $output;
   }
   else {
@@ -516,8 +515,8 @@ function theme_simple_access_profile_list($form) {
       ),
     );
   }
-  $output.= theme('table', $head, $rows);
-  $output.= drupal_render($form);
+  $output .= theme('table', $head, $rows);
+  $output .= drupal_render($form);
 
   return $output;
 }
@@ -623,7 +622,7 @@ function simple_access_settings_page() {
    $form['sa_showgroups'] = array(
     '#type' => 'checkbox',
     '#title' => 'Show groups even when user is not a member.',
-    '#default_value' => variable_get('sa_showgroups',0),
+    '#default_value' => variable_get('sa_showgroups', 0),
     '#description' => 'This is useful when you want to have a user be able to make content viewable by themselves and a higher privileged group (e.g. students sharing work with faculty)',
     );
   return system_settings_form($form);
@@ -750,7 +749,7 @@ function simple_access_group_select() {
     if (!$default_access) {
     // return just groups for which user is a member
       $roles = array_keys($user->roles);
-      $result = db_query('SELECT DISTINCT g.gid FROM {simple_access_groups} g INNER JOIN {simple_access_roles} r ON g.gid = r.gid WHERE r.rid IN (%s) ORDER BY weight, name', implode(',', $roles));
+      $result = db_query('SELECT DISTINCT g.gid FROM {simple_access_groups} g INNER JOIN {simple_access_roles} r ON g.gid = r.gid WHERE r.rid IN ('. implode(',', array_fill(0, count($roles), '%d')) .') ORDER BY weight, name', $roles);
       while ($group = db_fetch_array($result)) {
         $groups[$group['gid']]['access'] = TRUE;
       }
@@ -767,7 +766,7 @@ function simple_access_groups_from_roles($roles) {
   // there probably should be some 'static' stuff going on here
   // always return gid 0 just to be safe. 
   $gids = array(0);
-  $result = db_query("SELECT gid FROM {simple_access_roles} WHERE rid IN (%s)", implode(",", $roles));
+  $result = db_query('SELECT gid FROM {simple_access_roles} WHERE rid IN ('. implode(',', array_fill(0, count($roles), '%d')) .')', $roles);
   while ($g = db_fetch_object($result)) {
     $gids[] = $g->gid;
   }
@@ -790,7 +789,7 @@ function simple_access_save_group($edit) {
   db_query('DELETE FROM {simple_access_groups} WHERE gid = %d', $edit['gid']);
   $success = db_query("INSERT INTO {simple_access_groups} (gid, name, weight) VALUES (%d, '%s', %d)", $edit['gid'], $edit['name'], $edit['weight']);
   if (is_array($edit['roles'])) {
-    foreach($edit['roles'] as $key => $value) {
+    foreach ($edit['roles'] as $key => $value) {
       if ($value) {
         $success = $success && db_query('INSERT INTO {simple_access_roles} (rid, gid) VALUES (%d, %d)', $key, $edit['gid']);
       }
@@ -818,21 +817,21 @@ function simple_access_delete_group($gid) {
   * List hidden, editable, and deletable nodes
   */
 function simple_access_nodes() {
-  switch(arg(3)) {
+  switch (arg(3)) {
     case 'edit':
       drupal_set_title(t('Items With Edit Access Set'));
-      $output = '<div>'.t('These nodes have been set as "additionally editable by" certain Simple Access <a href="!url">groups</a>. ', array('!url' => url('admin/user/simple_access'))).'</div><br />';
+      $output = '<div>'. t('These nodes have been set as "additionally editable by" certain Simple Access <a href="!url">groups</a>. ', array('!url' => url('admin/user/simple_access'))) .'</div><br />';
       $sql = "SELECT DISTINCT n.title, na.nid FROM {node} n INNER JOIN {node_access} na ON n.nid = na.nid WHERE na.realm='simple_access' AND na.gid > 0 AND na.grant_update = 1";
       break;
     case 'delete':
       drupal_set_title(t('Items With Delete Access Set'));
-      $output = '<div>'.t('These nodes have been set as "additionally deletable by" certain Simple Access <a href="!url">groups</a>. ', array('!url' => url('admin/user/simple_access'))).'</div><br />';
+      $output = '<div>'. t('These nodes have been set as "additionally deletable by" certain Simple Access <a href="!url">groups</a>. ', array('!url' => url('admin/user/simple_access'))) .'</div><br />';
       $sql = "SELECT DISTINCT n.title, na.nid FROM {node} n INNER JOIN {node_access} na ON n.nid = na.nid WHERE na.realm='simple_access' AND na.gid > 0 AND na.grant_delete = 1";
       break;
     case 'view':
     default:
       drupal_set_title(t('Items With View Access Set'));
-      $output = '<div>'.t('These nodes have been set as "only viewable by" certain Simple Access <a href="!url">groups</a>.', array('!url' => url('admin/user/simple_access'))).'</div><br />';
+      $output = '<div>'. t('These nodes have been set as "only viewable by" certain Simple Access <a href="!url">groups</a>.', array('!url' => url('admin/user/simple_access'))) .'</div><br />';
       $sql = "SELECT DISTINCT n.title, na.nid FROM {node} n INNER JOIN {node_access} na ON n.nid = na.nid WHERE na.realm='simple_access' AND na.gid > 0 AND na.grant_view = 1";
       break;
   }
@@ -851,16 +850,16 @@ function simple_access_nodes() {
       $groups[] = $groups_info[$r2->gid]['name'];
     }
     $rows[$r->nid]['nid'] = array('data' => $r->nid, 'style' => 'vertical-align:top');
-    $info = '<div>'.$r->title.'</div><div style="font-size:xx-small">'.implode(', ', $groups).'</div>';
+    $info = '<div>'. $r->title .'</div><div style="font-size:xx-small">'. implode(', ', $groups) .'</div>';
     $rows[$r->nid]['title'] = array('data' => $info, 'style' => 'vertical-align:top');
-    $rows[$r->nid]['ops'] = array('data' => l(t('view'), 'node/'.$r->nid).' '.l(t('edit'), 'node/'.$r->nid.'/edit', array(), drupal_get_destination()), 'style' => 'vertical-align:top');
+    $rows[$r->nid]['ops'] = array('data' => l(t('view'), 'node/'. $r->nid) .' '. l(t('edit'), 'node/'. $r->nid .'/edit', array(), drupal_get_destination()), 'style' => 'vertical-align:top');
   }
   if ($rows) {
     $output .= theme('table', $header, $rows, array('style' => 'width:100%'));
     $output .= theme('pager', array(), 50);
   }
   else {
-    $output .= '<div>'.t('No nodes match this criteria.').'</div>';
+    $output .= '<div>'. t('No nodes match this criteria.') .'</div>';
   }
   return $output;
 }
