@@ -21,6 +21,13 @@ function simple_access_install() {
         `delete` tinyint unsigned NOT NULL default '0',
         PRIMARY KEY  (nid, gid)
       ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+      db_query("CREATE TABLE {simple_access_owner} (
+        nid int(10) unsigned NOT NULL default '0',
+        `view` tinyint unsigned NOT NULL default '0',
+        `update` tinyint unsigned NOT NULL default '0',
+        `delete` tinyint unsigned NOT NULL default '0',
+        PRIMARY KEY  (nid, uid)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
       db_query("CREATE TABLE {simple_access_groups} (
         gid int(10) NOT NULL default '0',
         name varchar(50) NOT NULL default '',
@@ -54,6 +61,12 @@ function simple_access_install() {
       db_query("CREATE TABLE {simple_access_groups} (
         nid integer unsigned NOT NULL default '0',
         gid integer unsigned NOT NULL default '0',
+        view integer unsigned NOT NULL default '0',
+        update integer unsigned NOT NULL default '0',
+        delete integer unsigned NOT NULL default '0',
+      );");
+      db_query("CREATE TABLE {simple_access_owner} (
+        nid integer unsigned NOT NULL default '0',
         view integer unsigned NOT NULL default '0',
         update integer unsigned NOT NULL default '0',
         delete integer unsigned NOT NULL default '0',
@@ -93,6 +106,7 @@ function simple_access_install() {
  */
 function simple_access_uninstall() {
   db_query('DROP TABLE {simple_access_groups}');
+  db_query('DROP TABLE {simple_access_owner}');
   db_query('DROP TABLE {simple_access_roles}');
   db_query('DROP TABLE {simple_access_node}');
   db_query('DROP TABLE {simple_access_profiles}');
@@ -120,22 +134,6 @@ function simple_access_disable() {
 /**
  * Updates
  */
-function simple_access_update_1() {
-  return _system_update_utf8(array('simple_access_groups', 'simple_access_roles'));
-}
-
-function simple_access_update_2() {
-  $ret[] = update_sql("CREATE TABLE {simple_access_node} SELECT nid, gid, grant_view, grant_update, grant_delete FROM {node_access} WHERE realm = 'simple_access'");
-  $ret[] = update_sql('ALTER TABLE {simple_access_node} ADD PRIMARY KEY (nid)');
-  $ret[] = update_sql("ALTER TABLE {simple_access_node} CHANGE `grant_view` `view` INT( 11 ) UNSIGNED NOT NULL DEFAULT '0', CHANGE `grant_update` `update` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0', CHANGE `grant_delete` `delete` TINYINT( 1 ) UNSIGNED NOT NULL DEFAULT '0' ");
-  return $ret;
-}
-
-function simple_access_update_3() {
-  $ret[] = update_sql('ALTER TABLE {simple_access_node} DROP PRIMARY KEY');
-  $ret[] = update_sql('ALTER TABLE {simple_access_node} ADD PRIMARY KEY (nid,gid)');
-  return $ret;
-}
 
 function simple_access_update_4() {
   switch ($GLOBALS['db_type']) {
@@ -180,4 +178,32 @@ function simple_access_update_4() {
       );");
       break;
   }
+
+  return array();
+}
+
+function simple_access_update_5() {
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      db_query("CREATE TABLE {simple_access_owner} (
+        nid int(10) unsigned NOT NULL default '0',
+        `view` tinyint unsigned NOT NULL default '0',
+        `update` tinyint unsigned NOT NULL default '0',
+        `delete` tinyint unsigned NOT NULL default '0',
+        PRIMARY KEY  (nid)
+      ) /*!40100 DEFAULT CHARACTER SET utf8 */;");
+      break;
+    case 'pgsql':
+      db_query("CREATE TABLE {simple_access_owner} (
+        nid integer unsigned NOT NULL default '0',
+        view integer unsigned NOT NULL default '0',
+        update integer unsigned NOT NULL default '0',
+        delete integer unsigned NOT NULL default '0',
+      );");
+      break;
+  }
+
+  $ret[] = update_sql('INSERT INTO {simple_access_owner} SELECT nid, 1, 1, 1 FROM {node};');
+  return $ret;
 }

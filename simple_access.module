@@ -155,7 +155,7 @@ function simple_access_menu($may_cache) {
  * Implementation of hook_perm().
  */
 function simple_access_perm() {
-  return array('manage simple access', 'assign access to nodes', 'assign profiles to profiles');
+  return array('manage simple access', 'assign access to nodes', 'assign profiles to profiles', 'assign owner permissions');
 }
 
 /**
@@ -164,6 +164,11 @@ function simple_access_perm() {
 function simple_access_nodeapi(&$node, $op) {
   switch ($op) {
     case 'prepare':
+      if (empty($node->simple_access_owner)) {
+        $node->simple_access_owner = array(
+          'view' => 1, 'update' => 1, 'delete' => 1,
+        );
+      }
       if (empty($node->simple_access)) {
         $node->simple_access = array();
       }
@@ -173,6 +178,7 @@ function simple_access_nodeapi(&$node, $op) {
       break;
 
     case 'load':
+      $node->simple_access_owner = db_fetch_array(db_query('SELECT no.view, no.update, no.delete FROM {simple_access_owner} no WHERE no.nid = %d', $node->nid));
       $extra = array();
       $result = db_query('SELECT na.gid, na.view, na.update, na.delete FROM {simple_access_node} na WHERE na.nid = %d', $node->nid);
       while ($grant = db_fetch_array($result)) {
@@ -190,6 +196,11 @@ function simple_access_nodeapi(&$node, $op) {
 
     case 'update':
     case 'insert':
+      $node->simple_access_owner['nid'] = $node->nid;
+      db_query('UPDATE {simple_access_owner} o SET o.view = %d, o.update = %d, o.delete = %d WHERE o.nid = %d', array_values($node->simple_access_owner));
+      if (!db_affected_rows()) {
+        db_query('INSERT INTO {simple_access_owner} (`view`, `update`, `delete`, nid) VALUES (%d, %d, %d, %d)', $node->simple_access_owner);
+      }
       db_query('DELETE FROM {simple_access_node} WHERE nid = %d', $node->nid);
       if (isset($node->simple_access)) {
         foreach ($node->simple_access as $gid => $access) {
@@ -211,6 +222,7 @@ function simple_access_nodeapi(&$node, $op) {
 
     case 'delete':
       db_query('DELETE FROM {simple_access_node} WHERE nid = %d', $node->nid);
+      db_query('DELETE FROM {simple_access_owner} WHERE nid = %d', $node->nid);
       db_query('DELETE FROM {simple_access_profiles_node} WHERE nid = %d', $node->nid);
       break;
   }
@@ -253,14 +265,12 @@ function simple_access_node_access_records($node) {
     }
   }
   if (!empty($records) && $node->uid) {
-    // FIXME: Need to work out a better method of determining the authors
-    // access to the node.
     $records[] = array(
       'realm' => 'simple_access_author',
       'gid' => $node->uid,
-      'grant_view' => user_access('access content'),
-      'grant_update' => user_access('access content'),
-      'grant_delete' => user_access('access content'),
+      'grant_view' => $node->simple_access_owner['view'],
+      'grant_update' => $node->simple_access_owner['update'],
+      'grant_delete' => $node->simple_access_owner['delete'],
       'priority' => 1,
     );
   }
@@ -306,9 +316,10 @@ function simple_access_form($node) {
   $groups = simple_access_group_select();
   $profiles = simple_access_get_profiles_select();
 
-  if (empty($groups) && empty($profiles)) {
+  if (empty($groups) && empty($profiles) && !user_access('assign owner permissions')) {
     return;
   }
+
   $user_groups = array_filter($node->simple_access, '_simple_access_filter_access');
   // set up the outer fieldset
   $form['sa'] = array(
@@ -327,13 +338,22 @@ function simple_access_form($node) {
       '#access' => user_access('assign access to profiles') || user_access('administer nodes'),
     );
   }
-  if (!empty($groups)) {
+  if (!empty($groups) || user_access('assign owner permissions')) {
     $form['sa']['simple_access'] = array(
       '#tree' => TRUE,
       '#weight' => 5,
-      '#access' => user_access('assign access to nodes') || user_access('administer nodes'),
+      '#access' => user_access('assign access to nodes') || user_access('administer nodes') || user_access('assign owner permissions'),
       '#theme' => 'simple_access_form',
     );
+
+    // Load the owner perminisions.
+    $group = array(
+      'name' => t('Owner permissions'),
+      'access' => user_access('assign owner permissions'),
+    );
+    $access = array('owner' => $node->simple_access_owner);
+    $form['sa']['simple_access']['owner'] = simple_access_form_row('owner', $group, $access);
+    $form['sa']['simple_access']['owner']['#parents'] = array('simple_access_owner');
 
     // See what form elements we should include. If not configured,
     // only enable the 'view' elements by default.
@@ -347,7 +367,9 @@ function simple_access_form($node) {
 }
 
 function simple_access_form_row($gid, $group, $access) {
-  $variable = variable_get('sa_display', array('view' => 1));
+  $variable = variable_get('sa_display', array(
+    'view' => 1, 'update' => 0, 'delete' => 0)
+  );
 
   $priv = $group['access'] || user_access('administer nodes');
   $form = array(
