@@ -3,229 +3,228 @@
 
 
 /**
-* @file
-* This module allows administrators to make nodes viewable by specific
-* 'access groups'. Each access group can contain any number of roles.
-* If a node is not assigned to any access groups, it will remain viewable 
-* by all users.
-*
-* Database definition:
-* @code
-* @endcode
-*
-*/
+ * @file
+ * This module allows administrators to make nodes viewable by specific
+ * 'access groups'. Each access group can contain any number of roles.
+ * If a node is not assigned to any access groups, it will remain viewable 
+ * by all users.
+ *
+ * Database definition:
+ * @code
+ * @endcode
+ *
+ */
 
 /**
-* Implementation of hook_menu().
-*/
+ * Implementation of hook_menu().
+ */
 function simple_access_menu() {
-$items['admin/user/simple_access'] = array(
-  'title' => 'Access groups',
-  'access callback' => 'user_access',
-  'access arguments' => array('manage simple access'),
-  'page callback' => 'simple_access_page_overview',
-  'type' => MENU_NORMAL_ITEM,
-  'description' => 'Manage groups of users for node-specific access control.',
-);
-$items['admin/user/simple_access/list'] = array(
-  'title' => 'List',
-  'access callback' => 'user_access',
-  'access arguments' => array('manage simple access'),
-  'type' => MENU_DEFAULT_LOCAL_TASK,
-  'weight' => -8,
-);
-$items['admin/user/simple_access/add'] = array(
-  'title' => 'Add Group',
-  'page callback' => 'drupal_get_form',
-  'page arguments' => array('simple_access_group_form'),
-  'access callback' => 'user_access',
-  'access arguments' => array('manage simple access'),
-  'type' => MENU_LOCAL_TASK,
-  'weight' => -6,
-);
-$items['admin/user/simple_access/edit/%'] = array(
-  'title' => 'Edit Group',
-  'page callback' => 'drupal_get_form',
-  'page arguments' => array('simple_access_group_form', 4),
-  'access callback' => 'user_access',
-  'access arguments' => array('manage simple access'),
-  'type' => MENU_CALLBACK,
-);
-$items['admin/user/simple_access/delete/%'] = array(
-  'title' => 'Delete Group',
-  'page callback' => 'drupal_get_form',
-  'page arguments' => array('simple_access_delete_group_confirm', 4),
-  'access callback' => 'user_access',
-  'access arguments' => array('manage simple access'),
-  'type' => MENU_CALLBACK,
-);
-$items['admin/user/sa_profiles'] = array(
-  'title' => 'Access profiles',
-  'page callback' => 'drupal_get_form',
-  'page arguments' => array('simple_access_profile_list'),
-  'access callback' => 'user_access',
-  'access arguments' => array('manage simple access'),
-  'type' => MENU_NORMAL_ITEM,
-  'description' => 'Maintain access profiles',
-);
-$items['admin/user/sa_profiles/list'] = array(
-  'title' => 'List',
-  'access callback' => 'user_access',
-  'access arguments' => array('manage simple access'),
-  'type' => MENU_DEFAULT_LOCAL_TASK,
-  'weight' => -9,
-);
-$items['admin/user/sa_profiles/add'] = array(
-  'title' => 'Add',
-  'page callback' => 'drupal_get_form',
-  'page arguments' => array('simple_access_profile_form'),
-  'access callback' => 'user_access',
-  'access arguments' => array('manage simple access'),
-  'type' => MENU_LOCAL_TASK,
-);
-$items['admin/settings/simple_access'] = array(
-  'title' => 'Simple Access',
-  'page callback' => 'drupal_get_form',
-  'page arguments' => array('simple_access_settings_page'),
-  'access callback' => 'user_access',
-  'access arguments' => array('manage simple access'),
-  'type' => MENU_NORMAL_ITEM,
-  'description' => 'Configure which kinds of access (view, edit, delete) users with permission to use Simple Access can define for each node.',
-);
+  $items['admin/user/simple_access'] = array(
+    'title' => 'Access groups',
+    'access callback' => 'user_access',
+    'access arguments' => array('manage simple access'),
+    'page callback' => 'simple_access_page_overview',
+    'type' => MENU_NORMAL_ITEM,
+    'description' => 'Manage groups of users for node-specific access control.',
+  );
+  $items['admin/user/simple_access/list'] = array(
+    'title' => 'List',
+    'access callback' => 'user_access',
+    'access arguments' => array('manage simple access'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -8,
+  );
+  $items['admin/user/simple_access/add'] = array(
+    'title' => 'Add Group',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simple_access_group_form'),
+    'access callback' => 'user_access',
+    'access arguments' => array('manage simple access'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => -6,
+  );
+  $items['admin/user/simple_access/edit/%'] = array(
+    'title' => 'Edit Group',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simple_access_group_form', 4),
+    'access callback' => 'user_access',
+    'access arguments' => array('manage simple access'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/user/simple_access/delete/%'] = array(
+    'title' => 'Delete Group',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simple_access_delete_group_confirm', 4),
+    'access callback' => 'user_access',
+    'access arguments' => array('manage simple access'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/user/sa_profiles'] = array(
+    'title' => 'Access profiles',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simple_access_profile_list'),
+    'access callback' => 'user_access',
+    'access arguments' => array('manage simple access'),
+    'type' => MENU_NORMAL_ITEM,
+    'description' => 'Maintain access profiles',
+  );
+  $items['admin/user/sa_profiles/list'] = array(
+    'title' => 'List',
+    'access callback' => 'user_access',
+    'access arguments' => array('manage simple access'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -9,
+  );
+  $items['admin/user/sa_profiles/add'] = array(
+    'title' => 'Add',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simple_access_profile_form'),
+    'access callback' => 'user_access',
+    'access arguments' => array('manage simple access'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/settings/simple_access'] = array(
+    'title' => 'Simple Access',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simple_access_settings_page'),
+    'access callback' => 'user_access',
+    'access arguments' => array('manage simple access'),
+    'type' => MENU_NORMAL_ITEM,
+    'description' => 'Configure which kinds of access (view, edit, delete) users with permission to use Simple Access can define for each node.',
+  );
 
-$items['admin/content/simple_access'] = array(
-  'title' => 'Simple Access',
-  'access callback' => 'user_access',
-  'access arguments' => array('administer nodes'),
-  'page callback' => 'simple_access_nodes',
-  'type' => MENU_NORMAL_ITEM,
-  'description' => 'View node access which has been set up via Simple Access.',
-);
-$items['admin/content/simple_access/view'] = array(
-  'title' => 'View',
-  'page callback' => 'simple_access_nodes',
-  'access callback' => 'user_access',
-  'access arguments' => array('administer nodes'),
-  'type' => MENU_DEFAULT_LOCAL_TASK,
-  'weight' => -5,
-);
-$items['admin/content/simple_access/edit'] = array(
-  'title' => 'Edit Access',
-  'page callback' => 'simple_access_nodes',
-  'access callback' => 'user_access',
-  'access arguments' => array('administer nodes'),
-  'type' => MENU_CALLBACK,
-  'weight' => -4,
-);
-$items['admin/content/simple_access/delete'] = array(
-  'title' => 'Delete Access',
-  'page callback' => 'simple_access_nodes',
-  'access callback' => 'user_access',
-  'access arguments' => array('administer nodes'),
-  'type' => MENU_CALLBACK,
-  'weight' => -3,
-);
-$items['admin/user/sa_profiles/%/edit'] = array(
-  'title' => 'Edit Profile',
-  'page callback' => 'drupal_get_form',
-  'page arguments' => array('simple_access_profile_form', arg(3)),
-  'access callback' => 'user_access',
-  'access arguments' => array('manage simple access'),
-  'type' => MENU_CALLBACK,
-);
-$items['admin/user/sa_profiles/%/delete'] = array(
-  'title' => 'Delete Profile',
-  'page callback' => 'drupal_get_form',
-  'page arguments' => array('simple_access_profile_delete_confirm', arg(3)),
-  'access callback' => 'user_access',
-  'access arguments' => array('manage simple access'),
-  'type' => MENU_CALLBACK,
-);
-return $items;
+  $items['admin/content/simple_access'] = array(
+    'title' => 'Simple Access',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer nodes'),
+    'page callback' => 'simple_access_nodes',
+    'type' => MENU_NORMAL_ITEM,
+    'description' => 'View node access which has been set up via Simple Access.',
+  );
+  $items['admin/content/simple_access/view'] = array(
+    'title' => 'View',
+    'page callback' => 'simple_access_nodes',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer nodes'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -5,
+  );
+  $items['admin/content/simple_access/edit'] = array(
+    'title' => 'Edit Access',
+    'page callback' => 'simple_access_nodes',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer nodes'),
+    'type' => MENU_CALLBACK,
+    'weight' => -4,
+  );
+  $items['admin/content/simple_access/delete'] = array(
+    'title' => 'Delete Access',
+    'page callback' => 'simple_access_nodes',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer nodes'),
+    'type' => MENU_CALLBACK,
+    'weight' => -3,
+  );
+  $items['admin/user/sa_profiles/%/edit'] = array(
+    'title' => 'Edit Profile',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simple_access_profile_form', arg(3)),
+    'access callback' => 'user_access',
+    'access arguments' => array('manage simple access'),
+    'type' => MENU_CALLBACK,
+  );
+  $items['admin/user/sa_profiles/%/delete'] = array(
+    'title' => 'Delete Profile',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('simple_access_profile_delete_confirm', arg(3)),
+    'access callback' => 'user_access',
+    'access arguments' => array('manage simple access'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
 }
 
 /**
-* Implementation of hook_perm().
-*/
+ * Implementation of hook_perm().
+ */
 function simple_access_perm() {
-return array('manage simple access', 'assign access to nodes', 'assign profiles to profiles', 'assign owner permissions');
+  return array('manage simple access', 'assign access to nodes', 'assign profiles to profiles', 'assign owner permissions');
 }
 
 /**
-* Implementation of hook_nodeapi()
-*/
+ * Implementation of hook_nodeapi()
+ */
 function simple_access_nodeapi(&$node, $op) {
-switch ($op) {
-  case 'prepare':
-    if (empty($node->simple_access_owner)) {
-      $node->simple_access_owner = array(
-        'view' => 1, 'update' => 1, 'delete' => 1,
-      );
-    }
-    if (empty($node->simple_access)) {
-      $node->simple_access = array();
-    }
-    if (empty($node->simple_access_profiles)) {
-      $node->simple_access_profiles = array();
-    }
-    break;
+  switch ($op) {
+    case 'prepare':
+      if (empty($node->simple_access_owner)) {
+        $node->simple_access_owner = array(
+          'view' => 1, 'update' => 1, 'delete' => 1,
+        );
+      }
+      if (empty($node->simple_access)) {
+        $node->simple_access = array();
+      }
+      if (empty($node->simple_access_profiles)) {
+        $node->simple_access_profiles = array();
+      }
+      break;
 
-  case 'load':
-    $node->simple_access_owner = db_fetch_array(db_query('SELECT no.view, no.update, no.delete FROM {simple_access_owner} no WHERE no.nid = %d', $node->nid));
-    $extra = array();
-    $result = db_query('SELECT na.gid, na.view, na.update, na.delete FROM {simple_access_node} na WHERE na.nid = %d', $node->nid);
-    while ($grant = db_fetch_array($result)) {
-      $gid = $grant['gid'];
-      unset($grant['gid']);
-      $extra[$gid] = $grant;
-    }
-    $node->simple_access = $extra;
-    
-    $result = db_query('SELECT pid FROM {simple_access_profiles_node} WHERE nid = %d', $node->nid);
-    while ($row = db_fetch_array($result)) {
-      $node->simple_access_profiles[] = $row['pid'];
-    }
-    break;
+    case 'load':
+      $node->simple_access_owner = db_fetch_array(db_query('SELECT no.view, no.update, no.delete FROM {simple_access_owner} no WHERE no.nid = %d', $node->nid));
+      $extra = array();
+      $result = db_query('SELECT na.gid, na.view, na.update, na.delete FROM {simple_access_node} na WHERE na.nid = %d', $node->nid);
+      while ($grant = db_fetch_array($result)) {
+        $gid = $grant['gid'];
+        unset($grant['gid']);
+        $extra[$gid] = $grant;
+      }
+      $node->simple_access = $extra;
+      
+      $result = db_query('SELECT pid FROM {simple_access_profiles_node} WHERE nid = %d', $node->nid);
+      while ($row = db_fetch_array($result)) {
+        $node->simple_access_profiles[] = $row['pid'];
+      }
+      break;
 
-  case 'update':
-  case 'insert':
-    $node->simple_access_owner['nid'] = $node->nid;
-    db_query('UPDATE {simple_access_owner} o SET o.view = %d, o.update = %d, o.delete = %d WHERE o.nid = %d', array_values($node->simple_access_owner));
-    if (!db_affected_rows()) {
-      db_query('INSERT INTO {simple_access_owner} (`view`, `update`, `delete`, nid) VALUES (%d, %d, %d, %d)', $node->simple_access_owner);
-    }
-    db_query('DELETE FROM {simple_access_node} WHERE nid = %d', $node->nid);
-    if (isset($node->simple_access)) {
-      foreach ($node->simple_access as $gid => $access) {
-        if ($access['view'] || $access['update'] || $access['delete']) {
-          db_query("INSERT INTO {simple_access_node} (`nid`, `gid`, `view`, `update`, `delete`) VALUES (%d, %d, %d, %d, %d)", $node->nid, $gid, $access['view'], $access['update'], $access['delete']);
+    case 'update':
+    case 'insert':
+      $node->simple_access_owner['nid'] = $node->nid;
+      db_query('UPDATE {simple_access_owner} o SET o.view = %d, o.update = %d, o.delete = %d WHERE o.nid = %d', array_values($node->simple_access_owner));
+      if (!db_affected_rows()) {
+        db_query('INSERT INTO {simple_access_owner} (`view`, `update`, `delete`, nid) VALUES (%d, %d, %d, %d)', $node->simple_access_owner);
+      }
+      db_query('DELETE FROM {simple_access_node} WHERE nid = %d', $node->nid);
+      if (isset($node->simple_access)) {
+        foreach ($node->simple_access as $gid => $access) {
+          if ($access['view'] || $access['update'] || $access['delete']) {
+            db_query("INSERT INTO {simple_access_node} (`nid`, `gid`, `view`, `update`, `delete`) VALUES (%d, %d, %d, %d, %d)", $node->nid, $gid, $access['view'], $access['update'], $access['delete']);
+          }
         }
       }
-    }
 
-    db_query('DELETE FROM {simple_access_profiles_node} WHERE nid = %d', $node->nid);
+     db_query('DELETE FROM {simple_access_profiles_node} WHERE nid = %d', $node->nid);
 
-    if (isset($node->simple_access_profiles)) {
-      foreach (array_filter($node->simple_access_profiles) as $pid) {
-        db_query('INSERT INTO {simple_access_profiles_node} (nid, pid) VALUES (%d, %d)', $node->nid, $pid);
-      }
-    }
+      if (isset($node->simple_access_profiles)) {
+        foreach (array_filter($node->simple_access_profiles) as $pid) {
+          db_query('INSERT INTO {simple_access_profiles_node} (nid, pid) VALUES (%d, %d)', $node->nid, $pid);
+        }
+     }
+     break;
 
-    break;
-
-  case 'delete':
-    db_query('DELETE FROM {simple_access_node} WHERE nid = %d', $node->nid);
-    db_query('DELETE FROM {simple_access_owner} WHERE nid = %d', $node->nid);
-    db_query('DELETE FROM {simple_access_profiles_node} WHERE nid = %d', $node->nid);
-    break;
-}
+   case 'delete':
+      db_query('DELETE FROM {simple_access_node} WHERE nid = %d', $node->nid);
+      db_query('DELETE FROM {simple_access_owner} WHERE nid = %d', $node->nid);
+      db_query('DELETE FROM {simple_access_profiles_node} WHERE nid = %d', $node->nid);
+      break;
+  }
 }
 
 /**
-* Implementation of hook_node_access_records
-*/
+ * Implementation of hook_node_access_records
+ */
 function simple_access_node_access_records($node) {
-$records = array();
+  $records = array();
 
   if ($node->simple_access_profiles) {
     foreach ($node->simple_access_profiles as $pid) {
@@ -240,56 +239,56 @@ $records = array();
     }
   }
 
-if ($node->simple_access) {
-  // loop through simple_access arrays from page submission
-  // $type is either 'view', 'update', or 'delete'
+  if ($node->simple_access) {
+    // loop through simple_access arrays from page submission
+    // $type is either 'view', 'update', or 'delete'
 
-  foreach ($node->simple_access as $gid => $access) {
-    if ($access['view'] || $access['update'] || $access['delete']) {
-      $records[] = array(
-        'realm' => 'simple_access',
-        'gid' => $gid,
-        'grant_view' => $access['view'],
-        'grant_update' => $access['update'],
-        'grant_delete' => $access['delete'],
-        'priority' => 1,
-      );
+    foreach ($node->simple_access as $gid => $access) {
+      if ($access['view'] || $access['update'] || $access['delete']) {
+        $records[] = array(
+          'realm' => 'simple_access',
+          'gid' => $gid,
+          'grant_view' => $access['view'],
+          'grant_update' => $access['update'],
+          'grant_delete' => $access['delete'],
+          'priority' => 1,
+        );
+      }
     }
   }
-}
-if (!empty($records) && $node->uid) {
-  $records[] = array(
-    'realm' => 'simple_access_author',
-    'gid' => $node->uid,
-    'grant_view' => $node->simple_access_owner['view'],
-    'grant_update' => $node->simple_access_owner['update'],
-    'grant_delete' => $node->simple_access_owner['delete'],
-    'priority' => 1,
-  );
-}
-return $records;
+  if (!empty($records) && $node->uid) {
+    $records[] = array(
+      'realm' => 'simple_access_author',
+      'gid' => $node->uid,
+      'grant_view' => $node->simple_access_owner['view'],
+      'grant_update' => $node->simple_access_owner['update'],
+      'grant_delete' => $node->simple_access_owner['delete'],
+      'priority' => 1,
+    );
+  }
+  return $records;
 }
 
 /**
-* Implementation of hook_node_grants().
-*
-*  @TODO implement to correcly return groups in all cases.
-*/
+ * Implementation of hook_node_grants().
+ *
+ *  @TODO implement to correcly return groups in all cases.
+ */
 function simple_access_node_grants($account, $op) {
-$gids = simple_access_groups_from_roles(array_keys($account->roles));
-$grants['simple_access'] = $gids;
+  $gids = simple_access_groups_from_roles(array_keys($account->roles));
+  $grants['simple_access'] = $gids;
 
-if (in_array($op, array('view', 'update', 'delete')) && !empty($gids)) {
-  $result = db_query('SELECT DISTINCT pid FROM {simple_access_profiles_access} WHERE `'. $op .'` = 1 AND gid in ('. implode(',', array_fill(0, count($gids), '%d')) .')', $gids);
-  while ($row = db_fetch_array($result)) {
-    $pids[] = $row['pid'];
+  if (in_array($op, array('view', 'update', 'delete')) && !empty($gids)) {
+    $result = db_query('SELECT DISTINCT pid FROM {simple_access_profiles_access} WHERE `'. $op .'` = 1 AND gid in ('. implode(',', array_fill(0, count($gids), '%d')) .')', $gids);
+    while ($row = db_fetch_array($result)) {
+      $pids[] = $row['pid'];
+    }
+    if (!empty($pids)) {
+      $grants['simple_access_profiles'] = $pids;
+    }
   }
-  if (!empty($pids)) {
-    $grants['simple_access_profiles'] = $pids;
-  }
-}
-$grants['simple_access_author'] = array($account->uid);
-return $grants;
+  $grants['simple_access_author'] = array($account->uid);
+  return $grants;
 }
 
 /**
@@ -330,11 +329,11 @@ function simple_access_form_alter(&$form, &$form_state, $form_id) {
 }
 
 function simple_access_theme() {
-return array(
-  'simple_access_form' => array(
-    'arguments' => array('form' => NULL),
-  ),
-);
+  return array(
+    'simple_access_form' => array(
+      'arguments' => array('form' => NULL),
+    ),
+  );
 }
 
 function simple_access_form($node) {
