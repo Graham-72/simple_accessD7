@@ -16,6 +16,13 @@
  */
 
 /**
+ * Check if Workflow NG is installed and load include
+ */
+if (module_exists('workflow_ng')) {
+  include_once './'. drupal_get_path('module', 'simple_access') .'/inc/workflow_ng.inc';
+}
+
+/**
  * Implementation of hook_menu().
  */
 function simple_access_menu($may_cache) {
