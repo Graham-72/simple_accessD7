@@ -161,6 +161,7 @@ function simple_access_action_group_grant_form($settings = array()) {
   $form['sa_group_permissions'] = array(
     '#tree' => TRUE,
     '#theme' => 'simple_access_form',
+    '#admin' => TRUE,
   );
 
   $groups = simple_access_get_groups();
@@ -215,6 +216,7 @@ function simple_access_action_group_revoke_form($settings = array()) {
   $form['sa_group_permissions'] = array(
     '#tree' => TRUE,
     '#theme' => 'simple_access_form',
+    '#admin' => TRUE,
   );
 
   $groups = simple_access_get_groups();
