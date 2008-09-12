@@ -227,7 +227,7 @@ function simple_access_node_access_records($node) {
   $records = array();
 
   if ($node->simple_access_profiles) {
-    foreach ($node->simple_access_profiles as $pid) {
+    foreach (array_filter($node->simple_access_profiles) as $pid) {
       $records[] = array(
         'realm' => 'simple_access_profile',
         'gid' => $pid,
