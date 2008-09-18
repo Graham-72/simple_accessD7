@@ -575,16 +575,14 @@ function simple_access_profile_form($pid = NULL) {
   $form = array();
   $access_profile = array();
 
-  if ($pid) {
+  if (!empty($pid)) {
     $profiles = simple_access_get_profiles();
     if (!isset($profiles[$pid])) {
       drupal_not_found();
       exit();
     }
     $access_profile = $profiles[$pid];
-  }
 
-  if (!empty($pid)) {
     $form['pid'] = array(
       '#type' => 'value',
       '#value' => $access_profile['pid'],
