@@ -159,7 +159,7 @@ function simple_access_nodeapi(&$node, $op) {
     case 'prepare':
       if (empty($node->simple_access_owner)) {
         $node->simple_access_owner = array(
-          'view' => 1, 'update' => 1, 'delete' => 1,
+          'view' => 0, 'update' => 0, 'delete' => 0,
         );
       }
       if (empty($node->simple_access)) {
@@ -171,7 +171,13 @@ function simple_access_nodeapi(&$node, $op) {
       break;
 
     case 'load':
-      $node->simple_access_owner = db_fetch_array(db_query('SELECT no.view, no.update, no.delete FROM {simple_access_owner} no WHERE no.nid = %d', $node->nid));
+      if ($row = db_fetch_array(db_query('SELECT no.view, no.update, no.delete FROM {simple_access_owner} no WHERE no.nid = %d', $node->nid))) {
+        $node->simple_access_owner = $row;
+      }
+      else {
+        $node->simple_access_owner = array('view' => 0, 'update' => 0, 'delete' => 0);
+      }
+
       $extra = array();
       $result = db_query('SELECT na.gid, na.view, na.update, na.delete FROM {simple_access_node} na WHERE na.nid = %d', $node->nid);
       while ($grant = db_fetch_array($result)) {
@@ -189,10 +195,12 @@ function simple_access_nodeapi(&$node, $op) {
 
     case 'update':
     case 'insert':
+      if ($node->uid) {
       $node->simple_access_owner['nid'] = $node->nid;
-      db_query('UPDATE {simple_access_owner} o SET o.view = %d, o.update = %d, o.delete = %d WHERE o.nid = %d', array_values($node->simple_access_owner));
-      if (!db_affected_rows()) {
-        db_query('INSERT INTO {simple_access_owner} (`view`, `update`, `delete`, nid) VALUES (%d, %d, %d, %d)', $node->simple_access_owner);
+        db_query('UPDATE {simple_access_owner} o SET o.view = %d, o.update = %d, o.delete = %d WHERE o.nid = %d', array_values($node->simple_access_owner));
+        if (!db_affected_rows()) {
+          db_query('INSERT INTO {simple_access_owner} (`view`, `update`, `delete`, nid) VALUES (%d, %d, %d, %d)', $node->simple_access_owner);
+        }
       }
       db_query('DELETE FROM {simple_access_node} WHERE nid = %d', $node->nid);
       if (isset($node->simple_access)) {
@@ -256,7 +264,7 @@ function simple_access_node_access_records($node) {
       }
     }
   }
-  if (!empty($records) && $node->uid) {
+  if ($node->uid && ($node->simple_access_owner['view'] || $node->simple_access_owner['update'] || $node->simple_access_owner['delete'])) {
     $records[] = array(
       'realm' => 'simple_access_author',
       'gid' => $node->uid,
@@ -310,8 +318,10 @@ function simple_access_node_access_explain($row) {
 
       $message = t('Access restrictions for profile "%profile"<br /><dt>', array('%profile' => $profile['name']));
 
-      foreach ($profile['access'] as $gid => $access) {
-        $message.= t(' "%group" group can @perm.', array('%group' => $groups[$gid]['name'], '@perm' => implode(', ', array_keys(array_filter($access)))));
+      if (!empty($profile['access'])) {
+        foreach ($profile['access'] as $gid => $access) {
+          $message.= t(' "%group" group can @perm.', array('%group' => $groups[$gid]['name'], '@perm' => implode(', ', array_keys(array_filter($access)))));
+        }
       }
       $message.= '</dt>';
 
@@ -377,7 +387,7 @@ function simple_access_form($node) {
     // Load the owner perminisions.
     $group = array(
       'name' => t('Owner permissions'),
-      'access' => user_access('assign owner permissions'),
+      'access' => user_access('assign owner permissions') && $node->uid,
     );
     $access = array('owner' => $node->simple_access_owner);
     $form['sa']['simple_access']['owner'] = simple_access_form_row('owner', $group, $access);
