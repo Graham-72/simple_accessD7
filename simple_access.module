@@ -78,7 +78,7 @@ function simple_access_menu() {
   $items['admin/user/sa_profiles/add'] = array(
     'title' => 'Add',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('simple_access_profile_form'),
+    'page arguments' => array('simple_access_profile_form', NULL),
     'access callback' => 'user_access',
     'access arguments' => array('manage simple access'),
     'type' => MENU_LOCAL_TASK,
@@ -581,7 +581,7 @@ function theme_simple_access_profile_list($form) {
   return $output;
 }
 
-function simple_access_profile_form($pid = NULL) {
+function simple_access_profile_form($form_state, $pid = NULL) {
   $form = array();
   $access_profile = array();
 
@@ -629,7 +629,6 @@ function simple_access_profile_form_submit($form, &$form_state) {
     drupal_write_record('simple_access_profiles', $form_state['values'], array('pid'));
   }
   else {
-    db_query("INSERT INTO {simple_access_profiles} (pid, name) VALUES (%d, '%s')", $form_state['values']['pid'], $form_state['values']['name']);
     drupal_write_record('simple_access_profiles', $form_state['values']);
   }
 
