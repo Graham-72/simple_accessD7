@@ -52,15 +52,15 @@ function simple_access_schema() {
         'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE,
         'default' => 0,
       ),
-      'view' => array(
+      'sa_view' => array(
         'type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE,
         'not null' => TRUE, 'default' => 0,
       ),
-      'update' => array(
+      'sa_update' => array(
         'type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE,
         'not null' => TRUE, 'default' => 0,
       ),
-      'delete' => array(
+      'sa_delete' => array(
         'type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE,
         'not null' => TRUE, 'default' => 0,
       ),
@@ -71,13 +71,13 @@ function simple_access_schema() {
     'fields' => array(
        'nid' => array('type' => 'int', 'unsigned' => TRUE, 
          'not null' => TRUE, 'default' => 0, 'disp-width' => '10'),
-       'view' => array('type' => 'int', 'unsigned' => TRUE, 
+       'sa_view' => array('type' => 'int', 'unsigned' => TRUE, 
          'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 
          'disp-width' => '3'),
-       'update' => array('type' => 'int', 'unsigned' => TRUE, 
+       'sa_update' => array('type' => 'int', 'unsigned' => TRUE, 
          'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 
          'disp-width' => '3'),
-       'delete' => array('type' => 'int', 'unsigned' => TRUE, 
+       'sa_delete' => array('type' => 'int', 'unsigned' => TRUE, 
          'size' => 'tiny', 'not null' => TRUE, 'default' => 0, 
          'disp-width' => '3')),
     'primary key' => array('nid'),
@@ -135,15 +135,15 @@ function simple_access_schema() {
         'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE,
         'default' => 0,
       ),
-      'view' => array(
+      'sa_view' => array(
         'type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE,
         'not null' => TRUE, 'default' => 0,
       ),
-      'update' => array(
+      'sa_update' => array(
         'type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE,
         'not null' => TRUE, 'default' => 0,
       ),
-      'delete' => array(
+      'sa_delete' => array(
         'type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE,
         'not null' => TRUE, 'default' => 0,
       ),
@@ -186,5 +186,23 @@ function simple_access_update_5() {
   db_create_table($ret, 'simple_access_owner', $table);
 
   $ret[] = update_sql('INSERT INTO {simple_access_owner} SELECT nid, 1, 1, 1 FROM {node};');
+  return $ret;
+}
+
+/**
+ * Rename all the fields named view, update, delete to sa_view, sa_update,
+ * sa_delete
+ */
+function simple_access_update_6() {
+  db_change_column($ret, 'simple_access_node', 'view', 'sa_view', 'int');
+  db_change_column($ret, 'simple_access_node', 'update', 'sa_update', 'int');
+  db_change_column($ret, 'simple_access_node', 'delete', 'sa_delete', 'int');
+  db_change_column($ret, 'simple_access_profiles_access', 'view', 'sa_view', 'int');
+  db_change_column($ret, 'simple_access_profiles_access', 'update', 'sa_update', 'int');
+  db_change_column($ret, 'simple_access_profiles_access', 'delete', 'sa_delete', 'int');
+  db_change_column($ret, 'simple_access_owner', 'view', 'sa_view', 'int');
+  db_change_column($ret, 'simple_access_owner', 'update', 'sa_update', 'int');
+  db_change_column($ret, 'simple_access_owner', 'delete', 'sa_delete', 'int');
+
   return $ret;
 }
