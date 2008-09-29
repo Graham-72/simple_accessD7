@@ -173,7 +173,7 @@ function simple_access_nodeapi(&$node, $op) {
     case 'prepare':
       if (empty($node->simple_access_owner)) {
         $node->simple_access_owner = array(
-          'view' => 0, 'update' => 0, 'delete' => 0,
+          'sa_view' => 0, 'sa_update' => 0, 'sa_delete' => 0,
         );
       }
       if (empty($node->simple_access)) {
@@ -185,15 +185,15 @@ function simple_access_nodeapi(&$node, $op) {
       break;
 
     case 'load':
-      if ($row = db_fetch_array(db_query('SELECT no.view, no.update, no.delete FROM {simple_access_owner} no WHERE no.nid = %d', $node->nid))) {
+      if ($row = db_fetch_array(db_query('SELECT no.sa_view, no.sa_update, no.sa_delete FROM {simple_access_owner} no WHERE no.nid = %d', $node->nid))) {
         $node->simple_access_owner = $row;
       }
       else {
-        $node->simple_access_owner = array('view' => 0, 'update' => 0, 'delete' => 0);
+        $node->simple_access_owner = array('sa_view' => 0, 'sa_update' => 0, 'sa_delete' => 0);
       }
 
       $extra = array();
-      $result = db_query('SELECT na.gid, na.view, na.update, na.delete FROM {simple_access_node} na WHERE na.nid = %d', $node->nid);
+      $result = db_query('SELECT na.gid, na.sa_view, na.sa_update, na.sa_delete FROM {simple_access_node} na WHERE na.nid = %d', $node->nid);
       while ($grant = db_fetch_array($result)) {
         $gid = $grant['gid'];
         unset($grant['gid']);
@@ -211,16 +211,16 @@ function simple_access_nodeapi(&$node, $op) {
     case 'insert':
       if ($node->uid) {
       $node->simple_access_owner['nid'] = $node->nid;
-        db_query('UPDATE {simple_access_owner} o SET o.view = %d, o.update = %d, o.delete = %d WHERE o.nid = %d', array_values($node->simple_access_owner));
+        db_query('UPDATE {simple_access_owner} o SET o.sa_view = %d, o.sa_update = %d, o.sa_delete = %d WHERE o.nid = %d', array_values($node->simple_access_owner));
         if (!db_affected_rows()) {
-          db_query('INSERT INTO {simple_access_owner} (`view`, `update`, `delete`, nid) VALUES (%d, %d, %d, %d)', $node->simple_access_owner);
+          db_query('INSERT INTO {simple_access_owner} (sa_view, sa_update, sa_delete, nid) VALUES (%d, %d, %d, %d)', $node->simple_access_owner);
         }
       }
       db_query('DELETE FROM {simple_access_node} WHERE nid = %d', $node->nid);
       if (isset($node->simple_access)) {
         foreach ($node->simple_access as $gid => $access) {
-          if ($access['view'] || $access['update'] || $access['delete']) {
-            db_query("INSERT INTO {simple_access_node} (`nid`, `gid`, `view`, `update`, `delete`) VALUES (%d, %d, %d, %d, %d)", $node->nid, $gid, $access['view'], $access['update'], $access['delete']);
+          if ($access['sa_view'] || $access['sa_update'] || $access['sa_delete']) {
+            db_query("INSERT INTO {simple_access_node} (nid, gid, sa_view, sa_update, sa_delete) VALUES (%d, %d, %d, %d, %d)", $node->nid, $gid, $access['sa_view'], $access['sa_update'], $access['sa_delete']);
           }
         }
       }
@@ -267,25 +267,25 @@ function simple_access_node_access_records($node) {
     // $type is either 'view', 'update', or 'delete'
 
     foreach ($node->simple_access as $gid => $access) {
-      if ($access['view'] || $access['update'] || $access['delete']) {
+      if ($access['sa_view'] || $access['sa_update'] || $access['sa_delete']) {
         $records[] = array(
           'realm' => 'simple_access',
           'gid' => $gid,
-          'grant_view' => $access['view'],
-          'grant_update' => $access['update'],
-          'grant_delete' => $access['delete'],
+          'grant_view' => $access['sa_view'],
+          'grant_update' => $access['sa_update'],
+          'grant_delete' => $access['sa_delete'],
           'priority' => 1,
         );
       }
     }
   }
-  if ($node->uid && ($node->simple_access_owner['view'] || $node->simple_access_owner['update'] || $node->simple_access_owner['delete'])) {
+  if ($node->uid && ($node->simple_access_owner['sa_view'] || $node->simple_access_owner['sa_update'] || $node->simple_access_owner['sa_delete'])) {
     $records[] = array(
       'realm' => 'simple_access_author',
       'gid' => $node->uid,
-      'grant_view' => $node->simple_access_owner['view'],
-      'grant_update' => $node->simple_access_owner['update'],
-      'grant_delete' => $node->simple_access_owner['delete'],
+      'grant_view' => $node->simple_access_owner['sa_view'],
+      'grant_update' => $node->simple_access_owner['sa_update'],
+      'grant_delete' => $node->simple_access_owner['sa_delete'],
       'priority' => 1,
     );
   }
@@ -302,7 +302,7 @@ function simple_access_node_grants($account, $op) {
   $grants['simple_access'] = $gids;
 
   if (in_array($op, array('view', 'update', 'delete')) && !empty($gids)) {
-    $result = db_query('SELECT DISTINCT pid FROM {simple_access_profiles_access} WHERE `'. $op .'` = 1 AND gid in ('. implode(',', array_fill(0, count($gids), '%d')) .')', $gids);
+    $result = db_query('SELECT DISTINCT pid FROM {simple_access_profiles_access} WHERE sa_'. $op .' = 1 AND gid in ('. implode(',', array_fill(0, count($gids), '%d')) .')', $gids);
     while ($row = db_fetch_array($result)) {
       $pids[] = $row['pid'];
     }
@@ -424,19 +424,19 @@ function simple_access_form_row($gid, $group, $access) {
     '#value' => $group['name'],
     '#access' => $priv,
   );
-  $form['view'] = array(
+  $form['sa_view'] = array(
     '#type' => 'checkbox',
-    '#default_value' => $access[$gid]['view'],
+    '#default_value' => $access[$gid]['sa_view'],
     '#access' => $priv && $variable['view'],
   );
-  $form['update'] = array(
+  $form['sa_update'] = array(
     '#type' => 'checkbox',
-    '#default_value' => $access[$gid]['update'],
+    '#default_value' => $access[$gid]['sa_update'],
     '#access' => $priv && $variable['update'],
   );
-  $form['delete'] = array(
+  $form['sa_delete'] = array(
     '#type' => 'checkbox',
-    '#default_value' => $access[$gid]['delete'],
+    '#default_value' => $access[$gid]['sa_delete'],
     '#access' => $priv && $variable['delete'],
   );
 
@@ -465,17 +465,17 @@ function theme_simple_access_form($form) {
       );
       if ($variable['view'] || isset($form['#admin'])) {
         $row[] = array(
-          'data' => drupal_render($form[$gid]['view']),
+          'data' => drupal_render($form[$gid]['sa_view']),
         );
       }
       if ($variable['update'] || isset($form['#admin'])) {
         $row[] = array(
-          'data' => drupal_render($form[$gid]['update']),
+          'data' => drupal_render($form[$gid]['sa_update']),
         );
       }
       if ($variable['delete'] || isset($form['#admin'])) {
         $row[] = array(
-          'data' => drupal_render($form[$gid]['delete']),
+          'data' => drupal_render($form[$gid]['sa_delete']),
         );
       }
 
@@ -643,8 +643,8 @@ function simple_access_profile_form_submit($form_id, $form_values) {
   db_query('DELETE FROM {simple_access_profiles_access} WHERE pid = %d', $form_values['pid']);
   if (isset($form_values['access'])) {
     foreach ($form_values['access'] as $gid => $access) {
-      if ($access['view'] || $access['update'] || $access['delete']) {
-        db_query("INSERT INTO {simple_access_profiles_access} (`pid`, `gid`, `view`, `update`, `delete`) VALUES (%d, %d, %d, %d, %d)", $form_values['pid'], $gid, $access['view'], $access['update'], $access['delete']);
+      if ($access['sa_view'] || $access['sa_update'] || $access['sa_delete']) {
+        db_query("INSERT INTO {simple_access_profiles_access} (pid, gid, sa_view, sa_update, sa_delete) VALUES (%d, %d, %d, %d, %d)", $form_values['pid'], $gid, $access['sa_view'], $access['sa_update'], $access['sa_delete']);
       }
     }
   }
@@ -773,13 +773,13 @@ function simple_access_get_profiles() {
     $profiles[$p['pid']]['access'] = array();
   }
 
-  $result = db_query('SELECT pid, gid, `view`, `update`, `delete` FROM {simple_access_profiles_access} ORDER BY pid');
+  $result = db_query('SELECT pid, gid, sa_view, sa_update, sa_delete FROM {simple_access_profiles_access} ORDER BY pid');
   while ($a = db_fetch_array($result)) {
     if (isset($profiles[$a['pid']])) {
       $profiles[$a['pid']]['access'][$a['gid']] = array(
-        'view' => $a['view'],
-        'update' => $a['update'],
-        'delete' => $a['delete'],
+        'sa_view' => $a['sa_view'],
+        'sa_update' => $a['sa_update'],
+        'sa_delete' => $a['sa_delete'],
       );
     }
   }
