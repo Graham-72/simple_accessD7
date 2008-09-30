@@ -194,15 +194,37 @@ function simple_access_update_5() {
  * sa_delete
  */
 function simple_access_update_6() {
-  db_change_column($ret, 'simple_access_node', 'view', 'sa_view', 'int');
-  db_change_column($ret, 'simple_access_node', 'update', 'sa_update', 'int');
-  db_change_column($ret, 'simple_access_node', 'delete', 'sa_delete', 'int');
-  db_change_column($ret, 'simple_access_profiles_access', 'view', 'sa_view', 'int');
-  db_change_column($ret, 'simple_access_profiles_access', 'update', 'sa_update', 'int');
-  db_change_column($ret, 'simple_access_profiles_access', 'delete', 'sa_delete', 'int');
-  db_change_column($ret, 'simple_access_owner', 'view', 'sa_view', 'int');
-  db_change_column($ret, 'simple_access_owner', 'update', 'sa_update', 'int');
-  db_change_column($ret, 'simple_access_owner', 'delete', 'sa_delete', 'int');
+  switch ($GLOBALS['db_type']) {
+    case 'mysql':
+    case 'mysqli':
+      $ret[] = update_sql("ALTER TABLE {simple_access_node} 
+        CHANGE `view` sa_view tinyint unsigned default '0',
+        CHANGE `update` sa_update tinyint unsigned default '0',
+        CHANGE `delete` sa_delete tinyint unsigned default '0' 
+      ");
+      $ret[] = update_sql("ALTER TABLE {simple_access_profiles_access} 
+        CHANGE `view` sa_view tinyint unsigned default '0',
+        CHANGE `update` sa_update tinyint unsigned default '0',
+        CHANGE `delete` sa_delete tinyint unsigned default '0' 
+      ");
+      $ret[] = update_sql("ALTER TABLE {simple_access_owner} 
+        CHANGE `view` sa_view tinyint unsigned default '0',
+        CHANGE `update` sa_update tinyint unsigned default '0',
+        CHANGE `delete` sa_delete tinyint unsigned default '0' 
+      ");
+      break;
+    case 'pgsql':
+      db_change_column($ret, 'simple_access_node', 'view', 'sa_view', 'int');
+      db_change_column($ret, 'simple_access_node', 'update', 'sa_update', 'int');
+      db_change_column($ret, 'simple_access_node', 'delete', 'sa_delete', 'int');
+      db_change_column($ret, 'simple_access_profiles_access', 'view', 'sa_view', 'int');
+      db_change_column($ret, 'simple_access_profiles_access', 'update', 'sa_update', 'int');
+      db_change_column($ret, 'simple_access_profiles_access', 'delete', 'sa_delete', 'int');
+      db_change_column($ret, 'simple_access_owner', 'view', 'sa_view', 'int');
+      db_change_column($ret, 'simple_access_owner', 'update', 'sa_update', 'int');
+      db_change_column($ret, 'simple_access_owner', 'delete', 'sa_delete', 'int');
+      break;
+  }
 
-  return $ret;
+  return $ret; 
 }
