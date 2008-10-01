@@ -1,6 +1,0 @@
-; $Id$
-name = Simple access actions
-description = Add actions to simple access to modify access during events
-dependencies[] = simple_access
-core = 6.x
-package = Node Access
