@@ -568,8 +568,8 @@ function theme_simple_access_page_overview($form) {
   return $output;
 }
 
-function simple_access_page_overview_submit($form, &$form_state) {
-  foreach ($form_state['values']['groups'] as $gid => $group) {
+function simple_access_page_overview_submit($form_id, $form_values) {
+  foreach ($form_values['groups'] as $gid => $group) {
     db_query('UPDATE simple_access_groups SET weight = %d WHERE gid = %d', $group['weight'], $gid);
   }
 }
@@ -633,8 +633,8 @@ function theme_simple_access_profile_list($form) {
   return $output;
 }
 
-function simple_access_profile_list_submit($form, $form_state) {
-  foreach ($form_state['values']['profiles'] as $pid => $profile) {
+function simple_access_profile_list_submit($form_id, $form_values) {
+  foreach ($form_values['profiles'] as $pid => $profile) {
     db_query('UPDATE simple_access_profiles SET weight = %d WHERE pid = %d', $profile['weight'], $pid);
   }
 }
