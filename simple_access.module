@@ -32,7 +32,8 @@ function simple_access_menu($may_cache) {
       'path' => 'admin/user/simple_access',
       'title' => t('Access groups'),
       'access' => $access,
-      'callback' => 'simple_access_page_overview',
+      'callback' => 'drupal_get_form',
+      'callback arguments' => array('simple_access_page_overview'),
       'type' => MENU_NORMAL_ITEM,
       'description' => t('Manage groups of users for node-specific access control.'),
     );
@@ -509,27 +510,67 @@ function simple_access_delete_group_confirm_submit($form_id, $form_values) {
 }
 
 function simple_access_page_overview() {
-  if (count($rg = simple_access_get_groups())) {
+  if (count($groups = simple_access_get_groups())) {
     drupal_set_title(t('Access groups'));
-    $header = array(t('Group'), t('Roles'), t('Operations'));
     $roles = user_roles();
-    foreach ($rg as $g) {
-      $gid = $g['gid'];
-      $rows[$gid]['group'] = $g['name'];
+    $form['groups'] = array(
+      '#tree' => TRUE,
+    );
+    foreach ($groups as $group) {
+      $gid = $group['gid'];
+      $form['groups'][$gid]['name'] = array(
+        '#value' => $group['name'],
+      );
       $r = array();
-      foreach ($g['roles'] as $rid) {
+      foreach ($group['roles'] as $rid) {
         $r[] = $roles[$rid];
       }
-      $rows[$gid]['roles'] = "<span style='font-size:xx-small'>". implode(', ', $r) ."</span>";
-      $rows[$gid]['ops'] = l('edit', 'admin/user/simple_access/edit/'. $gid) .'&nbsp;'. l('delete', 'admin/user/simple_access/delete/'. $gid);
+      $form['groups'][$gid]['roles'] = array(
+        '#value' => implode(', ', $r),
+      );
+      $form['groups'][$gid]['weight'] = array(
+        '#type' => 'weight',
+        '#default_value' => $group['weight'],
+        '#attributes' => array('class' => 'sa-group-weight'),
+      );
+      $form['groups'][$gid]['ops'] = array(
+        '#value' => l('edit', 'admin/user/simple_access/edit/'. $gid) .'&nbsp;'. l('delete', 'admin/user/simple_access/delete/'. $gid),
+      );
     }
-    $output .= theme('table', $header, $rows, array('style' => 'width:100%'));
-    $output .= '<br />'. l(t('add another access group'), 'admin/user/simple_access/add');
-    return $output;
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Update'),
+    );
+    return $form;
   }
   else {
     drupal_set_message(t('You have not yet defined any access groups.'));
     drupal_goto('admin/user/simple_access/add');
+  }
+}
+
+function theme_simple_access_page_overview($form) {
+  $header = array(t('Group'), t('Roles'), t('Weight'), t('Operations'));
+  foreach (element_children($form['groups']) as $gid) {
+    $rows[] = array(
+      'data' => array(
+        drupal_render($form['groups'][$gid]['name']),
+        array('data' => drupal_render($form['groups'][$gid]['roles']), 'class' => 'sa-group-roles'),
+        drupal_render($form['groups'][$gid]['weight']),
+        drupal_render($form['groups'][$gid]['ops']),
+      ),
+      'class' => 'draggable',
+    );
+  }
+  $output .= theme('table', $header, $rows, array('id' => 'sa-group-list'));
+  $output .= drupal_render($form); 
+
+  return $output;
+}
+
+function simple_access_page_overview_submit($form, &$form_state) {
+  foreach ($form_state['values']['groups'] as $gid => $group) {
+    db_query('UPDATE simple_access_groups SET weight = %d WHERE gid = %d', $group['weight'], $gid);
   }
 }
 
@@ -547,6 +588,7 @@ function simple_access_profile_list() {
     $form['profiles'][$row['pid']]['weight'] = array(
       '#type' => 'weight',
       '#default_value' => $row['weight'],
+      '#attributes' => array('class' => 'sa-profile-weight'),
     );
     $form['profiles'][$row['pid']]['operations'] = array(
       '#value' => l(t('edit'), 'admin/user/sa_profiles/'. $row['pid'] .'/edit') .' '. l(t('delete'), 'admin/user/sa_profiles/'. $row['pid'] .'/delete'),
@@ -567,9 +609,12 @@ function theme_simple_access_profile_list($form) {
 
   foreach (element_children($form['profiles']) as $id) {
     $rows[] = array(
-      drupal_render($form['profiles'][$id]['name']),
-      drupal_render($form['profiles'][$id]['weight']),
-      drupal_render($form['profiles'][$id]['operations']),
+      'data' => array(
+        array('data' => drupal_render($form['profiles'][$id]['name'])),
+        array('data' => drupal_render($form['profiles'][$id]['weight'])),
+        array('data' => drupal_render($form['profiles'][$id]['operations'])),
+      ),
+      'class' => 'draggable',
     );
   }
 
@@ -582,10 +627,16 @@ function theme_simple_access_profile_list($form) {
       ),
     );
   }
-  $output .= theme('table', $head, $rows);
+  $output .= theme('table', $head, $rows, array('id' => 'sa-profile-list'));
   $output .= drupal_render($form);
 
   return $output;
+}
+
+function simple_access_profile_list_submit($form, $form_state) {
+  foreach ($form_state['values']['profiles'] as $pid => $profile) {
+    db_query('UPDATE simple_access_profiles SET weight = %d WHERE pid = %d', $profile['weight'], $pid);
+  }
 }
 
 function simple_access_profile_form($pid = NULL) {
@@ -788,10 +839,11 @@ function simple_access_get_profiles() {
 
 function simple_access_get_groups() {
   $groups = array();
-  $result = db_query('SELECT gid, name FROM {simple_access_groups} ORDER BY weight, name');
+  $result = db_query('SELECT gid, name, weight FROM {simple_access_groups} ORDER BY weight, name');
   while ($g = db_fetch_array($result)) {
-    $groups[$g['gid']]['name']  = $g['name'];
-    $groups[$g['gid']]['gid']   = $g['gid'];
+    $groups[$g['gid']]['name']   = $g['name'];
+    $groups[$g['gid']]['gid']    = $g['gid'];
+    $groups[$g['gid']]['weight'] = $g['weight'];
     $groups[$g['gid']]['roles'] = simple_access_get_roles($g['gid']);
   }
   return $groups;
