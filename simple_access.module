@@ -371,7 +371,7 @@ function simple_access_form($node) {
     '#title' => t('Access'),
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
-    '#collapsed' => empty($user_groups) && empty($node->simple_access_profiles),
+    '#collapsed' => empty($user_groups) && empty($node->simple_access_profiles) && empty($node->simple_access_owner),
     '#access' => user_access('assign access to profiles') || user_access('assign access to nodes') || user_access('administer nodes'),
   );
   if (!empty($profiles)) {
