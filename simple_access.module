@@ -255,7 +255,7 @@ function simple_access_nodeapi(&$node, $op) {
 function simple_access_node_access_records($node) {
   $records = array();
 
-  if ($node->simple_access_profiles) {
+  if (!empty($node->simple_access_profiles)) {
     foreach (array_filter($node->simple_access_profiles) as $pid) {
       $records[] = array(
         'realm' => 'simple_access_profile',
@@ -268,7 +268,7 @@ function simple_access_node_access_records($node) {
     }
   }
 
-  if ($node->simple_access) {
+  if (!empty($node->simple_access)) {
     // loop through simple_access arrays from page submission
     // $type is either 'view', 'update', or 'delete'
 
