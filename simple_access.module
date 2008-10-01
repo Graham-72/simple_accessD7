@@ -197,17 +197,18 @@ function simple_access_nodeapi(&$node, $op) {
     case 'update':
     case 'insert':
       if ($node->uid) {
-      $node->simple_access_owner['nid'] = $node->nid;
-        db_query('UPDATE {simple_access_owner} o SET o.sa_view = %d, o.sa_update = %d, o.sa_delete = %d WHERE o.nid = %d', array_values($node->simple_access_owner));
-        if (!db_affected_rows()) {
-          db_query('INSERT INTO {simple_access_owner} (sa_view, sa_update, sa_delete, nid) VALUES (%d, %d, %d, %d)', $node->simple_access_owner);
+        $node->simple_access_owner['nid'] = $node->nid;
+        if (drupal_write_record('simple_access_owner', $node->simple_access_owner)) {
+          drupal_write_record('simple_access_owner', $node->simple_access_owner, array('nid'));
         }
       }
       db_query('DELETE FROM {simple_access_node} WHERE nid = %d', $node->nid);
       if (isset($node->simple_access)) {
         foreach ($node->simple_access as $gid => $access) {
           if ($access['sa_view'] || $access['sa_update'] || $access['sa_delete']) {
-            db_query("INSERT INTO {simple_access_node} (nid, gid, sa_view, sa_update, sa_delete) VALUES (%d, %d, %d, %d, %d)", $node->nid, $gid, $access['sa_view'], $access['sa_update'], $access['sa_delete']);
+            $access['nid'] = $node->nid;
+            $access['gid'] = $gid;
+            drupal_write_record('simple_access_node', $access);
           }
         }
       }
@@ -216,7 +217,11 @@ function simple_access_nodeapi(&$node, $op) {
 
       if (isset($node->simple_access_profiles)) {
         foreach (array_filter($node->simple_access_profiles) as $pid) {
-          db_query('INSERT INTO {simple_access_profiles_node} (nid, pid) VALUES (%d, %d)', $node->nid, $pid);
+          $data = array(
+            'nid' => $node->nid,
+            'pid' => $pid,
+          );
+          drupal_write_record('simple_access_profiles_node', $data);
         }
      }
      break;
@@ -914,9 +919,9 @@ function simple_access_save_group($edit) {
   if (is_array($edit['roles'])) {
     foreach ($edit['roles'] as $key => $value) {
       if ($value) {
-        $success = $success && db_query('INSERT INTO {simple_access_roles} (rid, gid) VALUES (%d, %d)', $key, $edit['gid']);
         $record = array('rid' => $key, 'gid' => $edit['gid']);
-        drupal_write_record('simple_access_roles', $record);
+        $s = drupal_write_record('simple_access_roles', $record);
+        $success = $success && $s;
       }
     }
   }
