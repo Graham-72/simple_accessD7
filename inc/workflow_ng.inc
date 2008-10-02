@@ -85,9 +85,9 @@ function simple_access_action_owner_grant_form($settings = array()) {
     '#title' => t('Grant owner permissions'),
     '#default_value' => $settings['sa_owner_permissions'],
     '#options' => array(
-      'view' => t('View'),
-      'update' => t('Update'),
-      'delete' => t('Delete'),
+      'sa_view' => t('View'),
+      'sa_update' => t('Update'),
+      'sa_delete' => t('Delete'),
     ),
     '#description' => t('Select permissions to grant for the content owner'),
   );
@@ -124,9 +124,9 @@ function simple_access_action_owner_revoke_form($settings = array()) {
     '#title' => t('Revoke owner permissions'),
     '#default_value' => $settings['sa_owner_permissions'],
     '#options' => array(
-      'view' => t('View'),
-      'update' => t('Update'),
-      'delete' => t('Delete'),
+      'sa_view' => t('View'),
+      'sa_update' => t('Update'),
+      'sa_delete' => t('Delete'),
     ),
     '#description' => t('Select permissions to revoke for the content owner'),
   );
@@ -170,17 +170,17 @@ function simple_access_action_group_grant_form($settings = array()) {
     $form['sa_group_permissions'][$gid]['name'] = array(
       '#value' => $group['name'],
     );
-    $form['sa_group_permissions'][$gid]['view'] = array(
+    $form['sa_group_permissions'][$gid]['sa_view'] = array(
       '#type' => 'checkbox',
-      '#default_value' => $settings['sa_group_permissions'][$gid]['view'],
+      '#default_value' => $settings['sa_group_permissions'][$gid]['sa_view'],
     );
-    $form['sa_group_permissions'][$gid]['update'] = array(
+    $form['sa_group_permissions'][$gid]['sa_update'] = array(
       '#type' => 'checkbox',
-      '#default_value' => $settings['sa_group_permissions'][$gid]['update'],
+      '#default_value' => $settings['sa_group_permissions'][$gid]['sa_update'],
     );
-    $form['sa_group_permissions'][$gid]['delete'] = array(
+    $form['sa_group_permissions'][$gid]['sa_delete'] = array(
       '#type' => 'checkbox',
-      '#default_value' => $settings['sa_group_permissions'][$gid]['delete'],
+      '#default_value' => $settings['sa_group_permissions'][$gid]['sa_delete'],
     );
   }
 
@@ -225,17 +225,17 @@ function simple_access_action_group_revoke_form($settings = array()) {
     $form['sa_group_permissions'][$gid]['name'] = array(
       '#value' => $group['name'],
     );
-    $form['sa_group_permissions'][$gid]['view'] = array(
+    $form['sa_group_permissions'][$gid]['sa_view'] = array(
       '#type' => 'checkbox',
-      '#default_value' => $settings['sa_group_permissions'][$gid]['view'],
+      '#default_value' => $settings['sa_group_permissions'][$gid]['sa_view'],
     );
-    $form['sa_group_permissions'][$gid]['update'] = array(
+    $form['sa_group_permissions'][$gid]['sa_update'] = array(
       '#type' => 'checkbox',
-      '#default_value' => $settings['sa_group_permissions'][$gid]['update'],
+      '#default_value' => $settings['sa_group_permissions'][$gid]['sa_update'],
     );
-    $form['sa_group_permissions'][$gid]['delete'] = array(
+    $form['sa_group_permissions'][$gid]['sa_delete'] = array(
       '#type' => 'checkbox',
-      '#default_value' => $settings['sa_group_permissions'][$gid]['delete'],
+      '#default_value' => $settings['sa_group_permissions'][$gid]['sa_delete'],
     );
   }
 
