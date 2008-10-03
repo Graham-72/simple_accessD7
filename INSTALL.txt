@@ -2,7 +2,7 @@
                      D R U P A L    M O D U L E
 ********************************************************************
 Name: simple_access module
-Author: Jeff Robbins
+Author: Gordon Heydon
 Dependancies:
   This module requires node module.
 
@@ -17,9 +17,9 @@ INSTALLATION
 
 3. After enabling this module in the previous step, navigate to
 
-     administer > access control > simple access
+     administer > content management > post settings
 
-   and click the 'Setup Database' button. The module is now installed.
+   and click the 'Rebuild permissions' button. The module is now installed.
 
 
 CREATING AN ACCESS GROUP
@@ -34,8 +34,10 @@ default, simple_access makes all content public.
 
    and fill in the form fields as required.
 
-
-SECURING CONTENT
+CREATING A PROFILE
 ********************************************************************
-Permissions are defined for content on the content editing form. A
-screenshot is here: http://www.jjeff.com/simple_access/
+Profiles are a method of defining the complete security configuration
+for a node. So within a single profile the system administrator can
+define exactly how a node will provide security. This means that users
+with less knowledge can secure nodes without fear of exposing nodes to
+users which should not have access.
