@@ -211,10 +211,11 @@ function simple_access_nodeapi(&$node, $op) {
 
     case 'update':
     case 'insert':
-      if ($node->uid) {
+      if ($node->uid && ($node->simple_access_owner['sa_view'] || $node->simple_access_owner['sa_update'] || $node->simple_access_owner['sa_update'])) {
         $node->simple_access_owner['nid'] = $node->nid;
-        if (drupal_write_record('simple_access_owner', $node->simple_access_owner)) {
-          drupal_write_record('simple_access_owner', $node->simple_access_owner, array('nid'));
+        drupal_write_record('simple_access_owner', $node->simple_access_owner, array('nid'));
+        if (!db_affected_rows()) {
+          drupal_write_record('simple_access_owner', $node->simple_access_owner);
         }
       }
       db_query('DELETE FROM {simple_access_node} WHERE nid = %d', $node->nid);
