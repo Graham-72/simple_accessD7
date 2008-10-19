@@ -390,12 +390,13 @@ function simple_access_form($node) {
   }
 
   $user_groups = array_filter($node->simple_access, '_simple_access_filter_access');
+  $owner_priv = array_filter($node->simple_access_owner);
   // set up the outer fieldset
   $form['sa'] = array(
     '#title' => t('Access'),
     '#type' => 'fieldset',
     '#collapsible' => TRUE,
-    '#collapsed' => empty($user_groups) && empty($node->simple_access_profiles) && empty($node->simple_access_owner),
+    '#collapsed' => empty($user_groups) && empty($node->simple_access_profiles) && empty($owner_priv),
     '#access' => user_access('assign access to profiles') || user_access('assign access to nodes') || user_access('administer nodes'),
   );
   if (!empty($profiles)) {
