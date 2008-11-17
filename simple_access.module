@@ -173,16 +173,11 @@ function simple_access_perm() {
 function simple_access_nodeapi(&$node, $op) {
   switch ($op) {
     case 'prepare':
-      if (empty($node->simple_access_owner)) {
-        $node->simple_access_owner = array(
-          'sa_view' => 0, 'sa_update' => 0, 'sa_delete' => 0,
-        );
-      }
-      if (empty($node->simple_access)) {
-        $node->simple_access = array();
-      }
-      if (empty($node->simple_access_profiles)) {
-        $node->simple_access_profiles = array();
+      $defaults = variable_get('simple_access_'. $node->type, array('simple_access' => array(), 'simple_access_profiles' => array(), 'simple_access_owner' => array()));
+      foreach ($defaults as $key => $value) {
+        if (!isset($node->{$key})) {
+          $node->{$key} = $value;
+        }
       }
       break;
 
@@ -360,6 +355,28 @@ function simple_access_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
+function simple_access_form_node_type_form_alter(&$form, &$form_state) {
+  $type = $form['old_type']['#value'];
+  $default = variable_get('simple_access_'. $type, array('simple_access' => array(), 'simple_access_profiles' => array(), 'simple_access_owner' => array()));
+
+  $tmp_form = simple_access_form((object)$default, TRUE);
+
+  $form['simple_access'] = $tmp_form['sa'];
+  $form['simple_access']['simple_access']['owner']['#parents'] = array('simple_access', 'simple_access_owner');
+  $form['simple_access']['#tree'] = TRUE;
+
+  $form['#submit'][] = 'simple_access_node_type_submit';
+}
+
+function simple_access_node_type_submit(&$form, &$form_state) {
+  $op = isset($form_state['values']['op']) ? $form_state['values']['op'] : '';
+  $type = $form_state['values']['type'];
+
+  if ($op == t('Save content type')) {
+    variable_set('simple_access_'. $type, $form_state['values']['simple_access']);
+  }
+}
+
 function simple_access_theme() {
   return array(
     'simple_access_form' => array(
@@ -377,7 +394,7 @@ function simple_access_theme() {
   );
 }
 
-function simple_access_form($node) {
+function simple_access_form($node, $admin = FALSE) {
   // Get the array of checkbox options to use for each form element.  
   // If the "Show groups even when user is not a member" setting is
   // enabled, or if the current user has 'administer nodes', let
@@ -416,13 +433,17 @@ function simple_access_form($node) {
       '#theme' => 'simple_access_form',
     );
 
+    if ($admin) {
+      $form['sa']['simple_access']['#admin'] = TRUE;
+    }
+
     // Load the owner perminisions.
     $group = array(
       'name' => t('Owner permissions'),
       'access' => user_access('assign owner permissions') && $node->uid,
     );
     $access = array('owner' => $node->simple_access_owner);
-    $form['sa']['simple_access']['owner'] = simple_access_form_row('owner', $group, $access);
+    $form['sa']['simple_access']['owner'] = simple_access_form_row('owner', $group, $access, $admin);
     $form['sa']['simple_access']['owner']['#parents'] = array('simple_access_owner');
 
     // See what form elements we should include. If not configured,
@@ -430,21 +451,31 @@ function simple_access_form($node) {
     $variable = variable_get('sa_display', array('view' => 1));
 
     foreach ($groups as $gid => $group) {
-      $form['sa']['simple_access'][$gid] = simple_access_form_row($gid, $group, $node->simple_access);
+      $form['sa']['simple_access'][$gid] = simple_access_form_row($gid, $group, $node->simple_access, $admin);
     }
   }
   return $form;
 }
 
-function simple_access_form_row($gid, $group, $access) {
-  $variable = variable_get('sa_display', array(
-    'view' => 1, 'update' => 0, 'delete' => 0)
-  );
+function simple_access_form_row($gid, $group, $access, $admin = FALSE) {
+  if ($admin) {
+    $variable = array('view' => 1, 'update' => 1, 'delete' => 1);
+  }
+  else {
+    $variable = variable_get('sa_display', array(
+      'view' => 1, 'update' => 0, 'delete' => 0)
+    );
+  }
 
   $priv = $group['access'] || user_access('administer nodes');
   $form = array(
     '#access' => $priv,
   );
+
+  if ($admin) {
+    $form['#admin'] = $admin;
+  }
+
   $form['name'] = array(
     '#value' => $group['name'],
     '#access' => $priv,
@@ -471,7 +502,12 @@ function theme_simple_access_form($form) {
   drupal_add_css(drupal_get_path('module', 'simple_access') .'/simple_access.css');
 
   $output = '';
-  $variable = variable_get('sa_display', array('view' => 1));
+  if (isset($form['#admin'])) {
+    $variable = array('view' => 1, 'update' => 1, 'delete' => 1);
+  }
+  else {
+    $variable = variable_get('sa_display', array('view' => 1));
+  }
   $head = array(t('Access Group'));
   if ($variable['view'] || isset($form['#admin'])) {
     $head[] = t('View');
