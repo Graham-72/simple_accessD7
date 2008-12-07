@@ -47,26 +47,6 @@ function simple_access_page_overview() {
   }
 }
 
-function theme_simple_access_page_overview($form) {
-  drupal_add_tabledrag('sa-group-list', 'order', 'sibling', 'sa-group-weight');
-  $header = array(t('Group'), t('Roles'), t('Weight'), t('Operations'));
-  foreach (element_children($form['groups']) as $gid) {
-    $rows[] = array(
-      'data' => array(
-        drupal_render($form['groups'][$gid]['name']),
-        array('data' => drupal_render($form['groups'][$gid]['roles']), 'class' => 'sa-group-roles'),
-        drupal_render($form['groups'][$gid]['weight']),
-        drupal_render($form['groups'][$gid]['ops']),
-      ),
-      'class' => 'draggable',
-    );
-  }
-  $output .= theme('table', $header, $rows, array('id' => 'sa-group-list'));
-  $output .= drupal_render($form); 
-
-  return $output;
-}
-
 function simple_access_page_overview_submit($form, &$form_state) {
   foreach ($form_state['values']['groups'] as $gid => $group) {
     $group['gid'] = $gid;
@@ -172,37 +152,6 @@ function simple_access_profile_list() {
   );
 
   return $form;
-}
-
-function theme_simple_access_profile_list($form) {
-  drupal_add_tabledrag('sa-profile-list', 'order', 'sibling', 'sa-profile-weight');
-  $head = array(t('Name'), t('Weight'), t('Operations'));
-  $rows = array();
-
-  foreach (element_children($form['profiles']) as $id) {
-    $rows[] = array(
-      'data' => array(
-        array('data' => drupal_render($form['profiles'][$id]['name'])),
-        array('data' => drupal_render($form['profiles'][$id]['weight'])),
-        array('data' => drupal_render($form['profiles'][$id]['operations'])),
-      ),
-      'class' => 'draggable',
-    );
-  }
-
-  if (empty($rows)) {
-    $rows[] = array(
-      array(
-        'data' => t('No profiles defined'),
-        'colspan' => 3,
-        'align' => 'center',
-      ),
-    );
-  }
-  $output .= theme('table', $head, $rows, array('id' => 'sa-profile-list'));
-  $output .= drupal_render($form);
-
-  return $output;
 }
 
 function simple_access_profile_list_submit($form, $form_state) {

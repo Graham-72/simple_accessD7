@@ -381,15 +381,15 @@ function simple_access_theme() {
   return array(
     'simple_access_form' => array(
       'arguments' => array('form' => NULL),
-      'file' => 'simple_access.admin.inc',
+      'file' => 'simple_access.theme.inc',
     ),
     'simple_access_page_overview' => array(
       'arguments' => array('form' => NULL),
-      'file' => 'simple_access.admin.inc',
+      'file' => 'simple_access.theme.inc',
     ),
     'simple_access_profile_list' => array(
       'arguments' => array('form' => NULL),
-      'file' => 'simple_access.admin.inc',
+      'file' => 'simple_access.theme.inc',
     ),
   );
 }
@@ -497,58 +497,6 @@ function simple_access_form_row($gid, $group, $access, $admin = FALSE) {
   );
 
   return $form;
-}
-function theme_simple_access_form($form) {
-  drupal_add_css(drupal_get_path('module', 'simple_access') .'/simple_access.css');
-
-  $output = '';
-  if (isset($form['#admin'])) {
-    $variable = array('view' => 1, 'update' => 1, 'delete' => 1);
-  }
-  else {
-    $variable = variable_get('sa_display', array('view' => 1));
-  }
-  $head = array(t('Access Group'));
-  if ($variable['view'] || isset($form['#admin'])) {
-    $head[] = t('View');
-  }
-  if ($variable['update'] || $form['#admin']) {
-    $head[] = t('Update');
-  }
-  if ($variable['delete'] || $form['#admin']) {
-    $head[] = t('Delete');
-  }
-
-  foreach (element_children($form) as $gid) {
-    if (!isset($form['#access']) || $form['#access']) {
-      $row = array(
-        array('data' => drupal_render($form[$gid]['name'])),
-      );
-      if ($variable['view'] || $form['#admin']) {
-        $row[] = array(
-          'data' => drupal_render($form[$gid]['sa_view']),
-        );
-      }
-      if ($variable['update'] || $form['#admin']) {
-        $row[] = array(
-          'data' => drupal_render($form[$gid]['sa_update']),
-        );
-      }
-      if ($variable['delete'] || $form['#admin']) {
-        $row[] = array(
-          'data' => drupal_render($form[$gid]['sa_delete']),
-        );
-      }
-
-      $rows[] = $row;
-    }
-  }
-
-  if (!empty($rows)) {
-    $output .= theme('table', $head, $rows);
-    $output .= drupal_render($form);
-    return $output;
-  }
 }
 
 function simple_access_get_roles($gid) {
