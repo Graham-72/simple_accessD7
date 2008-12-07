@@ -27,7 +27,7 @@ function simple_access_menu() {
     'page arguments' => array('simple_access_page_overview'),
     'type' => MENU_NORMAL_ITEM,
     'description' => 'Manage groups of users for node-specific access control.',
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/user/simple_access/list'] = array(
     'title' => 'List',
@@ -35,7 +35,7 @@ function simple_access_menu() {
     'access arguments' => array('manage simple access'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -8,
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/user/simple_access/add'] = array(
     'title' => 'Add Group',
@@ -45,7 +45,7 @@ function simple_access_menu() {
     'access arguments' => array('manage simple access'),
     'type' => MENU_LOCAL_TASK,
     'weight' => -6,
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/user/simple_access/edit/%'] = array(
     'title' => 'Edit Group',
@@ -54,7 +54,7 @@ function simple_access_menu() {
     'access callback' => 'user_access',
     'access arguments' => array('manage simple access'),
     'type' => MENU_CALLBACK,
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/user/simple_access/delete/%'] = array(
     'title' => 'Delete Group',
@@ -63,7 +63,7 @@ function simple_access_menu() {
     'access callback' => 'user_access',
     'access arguments' => array('manage simple access'),
     'type' => MENU_CALLBACK,
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/user/sa_profiles'] = array(
     'title' => 'Access profiles',
@@ -73,7 +73,7 @@ function simple_access_menu() {
     'access arguments' => array('manage simple access'),
     'type' => MENU_NORMAL_ITEM,
     'description' => 'Maintain access profiles',
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/user/sa_profiles/list'] = array(
     'title' => 'List',
@@ -81,7 +81,7 @@ function simple_access_menu() {
     'access arguments' => array('manage simple access'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -9,
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/user/sa_profiles/add'] = array(
     'title' => 'Add',
@@ -90,7 +90,7 @@ function simple_access_menu() {
     'access callback' => 'user_access',
     'access arguments' => array('manage simple access'),
     'type' => MENU_LOCAL_TASK,
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/settings/simple_access'] = array(
     'title' => 'Simple Access',
@@ -100,7 +100,7 @@ function simple_access_menu() {
     'access arguments' => array('manage simple access'),
     'type' => MENU_NORMAL_ITEM,
     'description' => 'Configure which kinds of access (view, edit, delete) users with permission to use Simple Access can define for each node.',
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
 
   $items['admin/content/simple_access'] = array(
@@ -110,7 +110,7 @@ function simple_access_menu() {
     'page callback' => 'simple_access_nodes',
     'type' => MENU_NORMAL_ITEM,
     'description' => 'View node access which has been set up via Simple Access.',
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/content/simple_access/view'] = array(
     'title' => 'View',
@@ -119,7 +119,7 @@ function simple_access_menu() {
     'access arguments' => array('administer nodes'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -5,
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/content/simple_access/edit'] = array(
     'title' => 'Edit Access',
@@ -128,7 +128,7 @@ function simple_access_menu() {
     'access arguments' => array('administer nodes'),
     'type' => MENU_CALLBACK,
     'weight' => -4,
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/content/simple_access/delete'] = array(
     'title' => 'Delete Access',
@@ -137,7 +137,7 @@ function simple_access_menu() {
     'access arguments' => array('administer nodes'),
     'type' => MENU_CALLBACK,
     'weight' => -3,
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/user/sa_profiles/%/edit'] = array(
     'title' => 'Edit Profile',
@@ -146,7 +146,7 @@ function simple_access_menu() {
     'access callback' => 'user_access',
     'access arguments' => array('manage simple access'),
     'type' => MENU_CALLBACK,
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   $items['admin/user/sa_profiles/%/delete'] = array(
     'title' => 'Delete Profile',
@@ -155,7 +155,7 @@ function simple_access_menu() {
     'access callback' => 'user_access',
     'access arguments' => array('manage simple access'),
     'type' => MENU_CALLBACK,
-    'file' => 'inc/admin.inc',
+    'file' => 'simple_access.admin.inc',
   );
   return $items;
 }
@@ -381,15 +381,15 @@ function simple_access_theme() {
   return array(
     'simple_access_form' => array(
       'arguments' => array('form' => NULL),
-      'file' => 'inc/admin.inc',
+      'file' => 'simple_access.admin.inc',
     ),
     'simple_access_page_overview' => array(
       'arguments' => array('form' => NULL),
-      'file' => 'inc/admin.inc',
+      'file' => 'simple_access.admin.inc',
     ),
     'simple_access_profile_list' => array(
       'arguments' => array('form' => NULL),
-      'file' => 'inc/admin.inc',
+      'file' => 'simple_access.admin.inc',
     ),
   );
 }
