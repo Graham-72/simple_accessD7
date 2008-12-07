@@ -142,7 +142,7 @@ function simple_access_menu() {
   $items['admin/user/sa_profiles/%/edit'] = array(
     'title' => 'Edit Profile',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('simple_access_profile_form', arg(3)),
+    'page arguments' => array('simple_access_profile_form', 3),
     'access callback' => 'user_access',
     'access arguments' => array('manage simple access'),
     'type' => MENU_CALLBACK,
@@ -151,7 +151,7 @@ function simple_access_menu() {
   $items['admin/user/sa_profiles/%/delete'] = array(
     'title' => 'Delete Profile',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('simple_access_profile_delete_confirm', arg(3)),
+    'page arguments' => array('simple_access_profile_delete_confirm', 3),
     'access callback' => 'user_access',
     'access arguments' => array('manage simple access'),
     'type' => MENU_CALLBACK,

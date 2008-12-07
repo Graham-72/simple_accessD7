@@ -352,7 +352,7 @@ function simple_access_nodes() {
   return $output;
 }
 
-function simple_access_profile_delete_confirm($pid = NULL) {
+function simple_access_profile_delete_confirm(&$form_state, $pid = NULL) {
   $form['pid'] = array(
     '#type' => 'value',
     '#value' => $pid
