@@ -348,7 +348,7 @@ function simple_access_node_access_explain($row) {
 
 function simple_access_form_alter(&$form, &$form_state, $form_id) {
   // if this is a node form...
-  if (isset($form['type']) && $form['type']['#value'] .'_node_form' == $form_id) {
+  if (isset($form['type']['#value']) && $form['type']['#value'] .'_node_form' == $form_id) {
     if ($simple_access_form = simple_access_form($form['#node'])) {
       $form = array_merge($form, $simple_access_form);
     }
