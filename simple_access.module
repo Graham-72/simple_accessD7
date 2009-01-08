@@ -642,12 +642,12 @@ function simple_access_delete_group($gid) {
 }
 
 /**
- * Filter the access records for the corrent user
+ * Filter the access records for the current user
  */
 function _simple_access_filter_access($a) {
   $groups = simple_access_group_select();
 
-  return isset($groups[$a['gid']]['access']) && $groups[$a['gid']]['access'];
+  return isset($a['gid']) && isset($groups[$a['gid']]['access']) && $groups[$a['gid']]['access'];
 }
 
 /**
