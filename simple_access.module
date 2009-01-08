@@ -440,7 +440,7 @@ function simple_access_form($node, $admin = FALSE) {
     // Load the owner perminisions.
     $group = array(
       'name' => t('Owner permissions'),
-      'access' => user_access('assign owner permissions') && $node->uid,
+      'access' => user_access('assign owner permissions') && isset($node->uid) && $node->uid,
     );
     $access = array('owner' => $node->simple_access_owner);
     $form['sa']['simple_access']['owner'] = simple_access_form_row('owner', $group, $access, $admin);
