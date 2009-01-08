@@ -16,13 +16,13 @@ function theme_simple_access_form($form) {
     $variable = variable_get('sa_display', array('view' => 1));
   }
   $head = array(t('Access Group'));
-  if ($variable['view'] || isset($form['#admin'])) {
+  if ((isset($variable['view']) && $variable['view']) || isset($form['#admin'])) {
     $head[] = t('View');
   }
-  if ($variable['update'] || $form['#admin']) {
+  if ((isset($variable['update']) && $variable['update']) || isset($form['#admin'])) {
     $head[] = t('Update');
   }
-  if ($variable['delete'] || $form['#admin']) {
+  if ((isset($variable['delete']) && $variable['delete']) || isset($form['#admin'])) {
     $head[] = t('Delete');
   }
 
@@ -31,17 +31,17 @@ function theme_simple_access_form($form) {
       $row = array(
         array('data' => drupal_render($form[$gid]['name'])),
       );
-      if ($variable['view'] || $form['#admin']) {
+      if ((isset($variable['view']) && $variable['view']) || isset($form['#admin'])) {
         $row[] = array(
           'data' => drupal_render($form[$gid]['sa_view']),
         );
       }
-      if ($variable['update'] || $form['#admin']) {
+      if ((isset($variable['update']) && $variable['update']) || isset($form['#admin'])) {
         $row[] = array(
           'data' => drupal_render($form[$gid]['sa_update']),
         );
       }
-      if ($variable['delete'] || $form['#admin']) {
+      if ((isset($variable['delete']) && $variable['delete']) || isset($form['#admin'])) {
         $row[] = array(
           'data' => drupal_render($form[$gid]['sa_delete']),
         );

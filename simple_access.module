@@ -467,6 +467,14 @@ function simple_access_form_row($gid, $group, $access, $admin = FALSE) {
     );
   }
 
+  $defaults = array('sa_view' => NULL, 'sa_update' => NULL, 'sa_delete' => NULL);
+  if (empty($access[$gid])) {
+    $access[$gid] = $defaults;
+  }
+  else {
+    $access[$gid]+= $defaults;
+  }
+
   $priv = $group['access'] || user_access('administer nodes');
   $form = array(
     '#access' => $priv,
