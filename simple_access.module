@@ -351,6 +351,20 @@ function simple_access_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['type']['#value']) && $form['type']['#value'] .'_node_form' == $form_id) {
     if ($simple_access_form = simple_access_form($form['#node'])) {
       $form = array_merge($form, $simple_access_form);
+      
+      if (module_exists('vertical_tabs')) {
+        global $conf;
+        
+        drupal_add_js(drupal_get_path('module', 'simple_access') .'/simple_access.js');
+        
+        if (!isset($conf['vertical_tabs_fieldsets_'. $form['type']['#value']])) {
+          $conf['vertical_tabs_fieldsets_'. $form['type']['#value']] = vertical_tabs_fieldsets($form['type']['#value']);
+          $conf['vertical_tabs_fieldsets_'. $form['type']['#value']][] = 'sa';
+        }
+        elseif (!in_array('simple-access', $conf['vertical_tabs_fieldsets_'. $form['type']['#value']])) {
+          $conf['vertical_tabs_fieldsets_'. $form['type']['#value']][] = 'sa';
+        }
+      }
     }
   }
 }
@@ -415,6 +429,9 @@ function simple_access_form($node, $admin = FALSE) {
     '#collapsible' => TRUE,
     '#collapsed' => empty($user_groups) && empty($node->simple_access_profiles) && empty($owner_priv),
     '#access' => user_access('assign access to profiles') || user_access('assign access to nodes') || user_access('administer nodes'),
+    '#attributes' => array(
+      'class' => 'simple-access-settings',
+    ),
   );
   if (!empty($profiles)) {
     $form['sa']['simple_access_profiles'] = array(
