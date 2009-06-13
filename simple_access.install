@@ -183,7 +183,7 @@ function simple_access_update_5() {
   $table = drupal_get_schema('simple_access_owner');
   db_create_table($ret, 'simple_access_owner', $table);
 
-  $ret[] = update_sql('INSERT INTO {simple_access_owner} SELECT nid, 1, 1, 1 FROM {node};');
+  $ret[] = update_sql('INSERT INTO {simple_access_owner} SELECT DISTINCT(nid), 1, 1, 1 FROM {simple_access_node}');
   return $ret;
 }
 
