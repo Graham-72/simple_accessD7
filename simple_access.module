@@ -610,12 +610,25 @@ function simple_access_group_select() {
 function simple_access_groups_from_roles($roles) {
   // there probably should be some 'static' stuff going on here
   // always return gid 0 just to be safe. 
-  $gids = array(0);
-  $result = db_query('SELECT gid FROM {simple_access_roles} WHERE rid IN ('. implode(',', array_fill(0, count($roles), '%d')) .')', $roles);
+  $gids = array();
+  $result = db_query('SELECT DISTINCT(gid) FROM {simple_access_roles} WHERE rid IN ('. implode(',', array_fill(0, count($roles), '%d')) .')', $roles);
   while ($g = db_fetch_object($result)) {
     $gids[] = $g->gid;
   }
   return $gids;
+}
+
+/**
+ *
+ */
+function simple_access_groups_check_user($groups) {
+  global $user;
+  
+  $roles = array_keys($user->roles);
+  $roles[] = $user->uid ? DRUPAL_AUTHENTICATED_RID : DRUPAL_ANONYMOUS_RID;
+  
+  $user_groups = simple_access_groups_from_roles($roles);
+  return array_intersect(array_filter($groups, $user_groups));
 }
 
 /**
@@ -973,3 +986,9 @@ function simple_access_profile_disable($node, $conf) {
   return array('node' => $node);
 }
 
+/**
+ * Implementation of hook_views_api().
+ */
+function simple_access_views_api() {
+  return array('api' => 2.0);
+}
