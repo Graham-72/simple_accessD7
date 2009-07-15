@@ -420,8 +420,8 @@ function simple_access_form($node, $admin = FALSE) {
     return;
   }
 
-  $user_groups = array_filter($node->simple_access, '_simple_access_filter_access');
-  $owner_priv = array_filter($node->simple_access_owner);
+  $user_groups = is_array($node->simple_access) ? array_filter($node->simple_access, '_simple_access_filter_access') : array();
+  $owner_priv = is_array($node->simple_access_owner) ? array_filter($node->simple_access_owner) : array();
   // set up the outer fieldset
   $form['sa'] = array(
     '#title' => t('Access'),
