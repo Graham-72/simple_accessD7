@@ -432,6 +432,7 @@ function simple_access_form($node, $admin = FALSE) {
     '#attributes' => array(
       'class' => 'simple-access-settings',
     ),
+    '#weight' => (module_exists('content') && isset($form['type'])) ? content_extra_field_weight($form['type']['#value'], 'sa') : 20,
   );
   if (!empty($profiles)) {
     $form['sa']['simple_access_profiles'] = array(
@@ -991,4 +992,17 @@ function simple_access_profile_disable($node, $conf) {
  */
 function simple_access_views_api() {
   return array('api' => 2.0);
+}
+
+/**
+ * Implementation of hook_content_extra_fields().
+ */
+function simple_access_content_extra_fields($type_name) {
+  $fields['simple_access'] = array(
+    'label' => t('Simple Access'),
+    'description' => t('Simple Access module form.'),
+    'weight' => 20,
+  );
+
+  return $fields;
 }
