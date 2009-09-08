@@ -595,7 +595,7 @@ function simple_access_group_select() {
     if (!$default_access) {
     // return just groups for which user is a member
       $roles = array_keys($user->roles);
-      $result = db_query('SELECT DISTINCT(g.gid) FROM {simple_access_groups} g INNER JOIN {simple_access_roles} r ON g.gid = r.gid WHERE r.rid IN ('. implode(',', array_fill(0, count($roles), '%d')) .') ORDER BY g.weight, g.name', $roles);
+      $result = db_query('SELECT g.gid FROM {simple_access_groups} g INNER JOIN {simple_access_roles} r ON g.gid = r.gid WHERE r.rid IN ('. implode(',', array_fill(0, count($roles), '%d')) .') GROUP BY g.gid', $roles);
       while ($group = db_fetch_array($result)) {
         $groups[$group['gid']]['access'] = TRUE;
       }
