@@ -11,6 +11,8 @@
  */
 function simple_access_install() {
   drupal_install_schema('simple_access');
+  db_query("UPDATE {system} SET weight = 9 WHERE name = '%s'", 'simple_access');
+  
   drupal_set_message(t('simple access has created the required tables.'));
 }
 
@@ -243,6 +245,17 @@ function simple_access_update_6200() {
       'primary keys' => array('nid', 'pid'),
     ));
   }
+  
+  return $ret;
+}
+
+/**
+ * Change weight of simple access to after other modules like og
+ */
+function simple_access_update_6201() {
+  $ret = array();
+  
+  $ret[] = update_sql("UPDATE {system} SET weight = 9 WHERE name = 'simple_access'");
   
   return $ret;
 }
