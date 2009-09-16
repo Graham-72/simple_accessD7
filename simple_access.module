@@ -102,43 +102,6 @@ function simple_access_menu() {
     'description' => 'Configure which kinds of access (view, edit, delete) users with permission to use Simple Access can define for each node.',
     'file' => 'simple_access.admin.inc',
   );
-
-  $items['admin/content/simple_access'] = array(
-    'title' => 'Simple Access',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer nodes'),
-    'page callback' => 'simple_access_nodes',
-    'type' => MENU_NORMAL_ITEM,
-    'description' => 'View node access which has been set up via Simple Access.',
-    'file' => 'simple_access.admin.inc',
-  );
-  $items['admin/content/simple_access/view'] = array(
-    'title' => 'View',
-    'page callback' => 'simple_access_nodes',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer nodes'),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
-    'weight' => -5,
-    'file' => 'simple_access.admin.inc',
-  );
-  $items['admin/content/simple_access/edit'] = array(
-    'title' => 'Edit Access',
-    'page callback' => 'simple_access_nodes',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer nodes'),
-    'type' => MENU_CALLBACK,
-    'weight' => -4,
-    'file' => 'simple_access.admin.inc',
-  );
-  $items['admin/content/simple_access/delete'] = array(
-    'title' => 'Delete Access',
-    'page callback' => 'simple_access_nodes',
-    'access callback' => 'user_access',
-    'access arguments' => array('administer nodes'),
-    'type' => MENU_CALLBACK,
-    'weight' => -3,
-    'file' => 'simple_access.admin.inc',
-  );
   $items['admin/user/sa_profiles/%/edit'] = array(
     'title' => 'Edit Profile',
     'page callback' => 'drupal_get_form',
