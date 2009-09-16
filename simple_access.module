@@ -178,6 +178,9 @@ function simple_access_nodeapi(&$node, $op) {
           drupal_write_record('simple_access_owner', $node->simple_access_owner);
         }
       }
+      else {
+        db_query('DELETE FROM {simple_access_owner} WHERE nid = %d', $node->nid);
+      }
       db_query('DELETE FROM {simple_access_node} WHERE nid = %d', $node->nid);
       if (isset($node->simple_access)) {
         foreach ($node->simple_access as $gid => $access) {
@@ -189,8 +192,7 @@ function simple_access_nodeapi(&$node, $op) {
         }
       }
 
-     db_query('DELETE FROM {simple_access_profiles_node} WHERE nid = %d', $node->nid);
-
+      db_query('DELETE FROM {simple_access_profiles_node} WHERE nid = %d', $node->nid);
       if (isset($node->simple_access_profiles)) {
         foreach (array_filter($node->simple_access_profiles) as $pid) {
           $data = array(
