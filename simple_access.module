@@ -230,7 +230,7 @@ function simple_access_node_access_records($node) {
         'grant_view' => 1,
         'grant_update' => 1,
         'grant_delete' => 1,
-        'priority' => 1,
+        'priority' => 0,
       );
     }
   }
@@ -247,7 +247,7 @@ function simple_access_node_access_records($node) {
           'grant_view' => $access['sa_view'],
           'grant_update' => $access['sa_update'],
           'grant_delete' => $access['sa_delete'],
-          'priority' => 1,
+          'priority' => 0,
         );
       }
     }
@@ -259,7 +259,7 @@ function simple_access_node_access_records($node) {
       'grant_view' => $node->simple_access_owner['sa_view'],
       'grant_update' => $node->simple_access_owner['sa_update'],
       'grant_delete' => $node->simple_access_owner['sa_delete'],
-      'priority' => 1,
+      'priority' => 0,
     );
   }
   return $records;
