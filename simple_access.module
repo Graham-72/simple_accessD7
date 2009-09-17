@@ -141,7 +141,7 @@ function simple_access_nodeapi(&$node, $op) {
         $defaults = variable_get('simple_access_'. $node->type, array('simple_access' => array(), 'simple_access_profiles' => array(), 'simple_access_owner' => array()));
       }
       else {
-        $defaults = array('simple_access' => array(), 'simple_access_profiles' => array(), 'simple_access_owner' => array())
+        $defaults = array('simple_access' => array(), 'simple_access_profiles' => array(), 'simple_access_owner' => array());
       }
       foreach ($defaults as $key => $value) {
         if (!isset($node->{$key})) {
