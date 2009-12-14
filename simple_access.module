@@ -324,17 +324,8 @@ function simple_access_form_alter(&$form, &$form_state, $form_id) {
       $form = array_merge($form, $simple_access_form);
       
       if (module_exists('vertical_tabs')) {
-        global $conf;
-        
-        drupal_add_js(drupal_get_path('module', 'simple_access') .'/simple_access.js');
-        
-        if (!isset($conf['vertical_tabs_fieldsets_'. $form['type']['#value']])) {
-          $conf['vertical_tabs_fieldsets_'. $form['type']['#value']] = vertical_tabs_fieldsets($form['type']['#value']);
-          $conf['vertical_tabs_fieldsets_'. $form['type']['#value']][] = 'sa';
-        }
-        elseif (!in_array('simple-access', $conf['vertical_tabs_fieldsets_'. $form['type']['#value']])) {
-          $conf['vertical_tabs_fieldsets_'. $form['type']['#value']][] = 'sa';
-        }
+        $form['sa']['#group'] = 'additional_settings';
+        $form['sa']['#attached']['js']['vertical-tabs'] = drupal_get_path('module', 'simple_access') . '/simple_access.js';
       }
     }
   }
