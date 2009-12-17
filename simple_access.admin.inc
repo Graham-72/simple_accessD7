@@ -215,7 +215,7 @@ function simple_access_profile_form_submit($form, &$form_state) {
   db_query('DELETE FROM {simple_access_profiles_access} WHERE pid = %d', $form_state['values']['pid']);
   if (isset($form_state['values']['access'])) {
     foreach ($form_state['values']['access'] as $gid => $access) {
-      if ($access['view'] || $access['update'] || $access['delete']) {
+      if ($access['sa_view'] || $access['sa_update'] || $access['sa_delete']) {
         $access['pid'] = $form_state['values']['pid'];
         $access['gid'] = $gid;
         drupal_write_record('simple_access_profiles_access', $access);
