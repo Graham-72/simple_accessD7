@@ -258,3 +258,23 @@ function simple_access_update_6201() {
   
   return $ret;
 }
+
+/** 
+ * Fix up the name of the simple_access_node names during the update.
+ */
+function simple_access_update_6202() {
+  $ret = array();
+  
+  if (db_column_exists('simple_access_node', 'view')) {
+    db_change_field($ret, 'simple_access_node', 'view', 'sa_view', array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0,));
+  }
+  if (db_column_exists('simple_access_node', 'update')) {
+    db_change_field($ret, 'simple_access_node', 'update', 'sa_update', array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0,));
+  }
+  if (db_column_exists('simple_access_node', 'delete')) {
+    db_change_field($ret, 'simple_access_node', 'delete', 'sa_delete', array('type' => 'int', 'size' => 'tiny', 'unsigned' => TRUE, 'not null' => TRUE, 'default' => 0,));
+  }
+  
+  
+  return $ret;
+}
